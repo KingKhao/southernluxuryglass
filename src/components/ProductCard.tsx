@@ -6,10 +6,16 @@ type Product = {
   category: string;
   price: number;
   description: string;
-  imageUrl: string;
+  images: string[];
 };
 
+const PLACEHOLDER =
+  "https://placehold.co/800x600/E9E3D5/2F4A3D?font=playfair-display&text=Photo+Coming+Soon";
+
 export default function ProductCard({ product }: { product: Product }) {
+  const cover = product.images[0] ?? PLACEHOLDER;
+  const extraCount = Math.max(0, product.images.length - 1);
+
   const mailto = `mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent(
     `Inquiry about "${product.name}"`
   )}&body=${encodeURIComponent(
@@ -18,12 +24,15 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="flex flex-col overflow-hidden rounded-lg border border-emerald/15 bg-white/70 shadow-sm transition-shadow hover:shadow-md">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={product.imageUrl}
-        alt={product.name}
-        className="h-56 w-full object-cover"
-      />
+      <div className="relative">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={cover} alt={product.name} className="h-56 w-full object-cover" />
+        {extraCount > 0 && (
+          <span className="absolute bottom-2 right-2 rounded-full bg-charcoal/70 px-2 py-0.5 text-xs text-white">
+            +{extraCount} more
+          </span>
+        )}
+      </div>
       <div className="flex flex-1 flex-col gap-2 p-5">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-serif text-lg text-emerald">{product.name}</h3>

@@ -8,9 +8,13 @@ export const metadata = {
 };
 
 export default async function GalleryPage() {
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const [products, categories] = await Promise.all([
+    prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { category: true },
+    }),
+    prisma.category.findMany({ orderBy: { sortOrder: "asc" } }),
+  ]);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
@@ -24,7 +28,17 @@ export default async function GalleryPage() {
           purchased online yet, just inquired about.
         </p>
       </div>
-      <GalleryGrid products={products} />
+      <GalleryGrid
+        products={products.map((p) => ({
+          id: p.id,
+          name: p.name,
+          category: p.category.name,
+          price: p.price,
+          description: p.description,
+          images: p.images,
+        }))}
+        categoryOrder={categories.map((c) => c.name)}
+      />
     </div>
   );
 }

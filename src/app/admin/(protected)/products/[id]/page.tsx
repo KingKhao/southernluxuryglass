@@ -3,12 +3,17 @@ import { prisma } from "@/lib/prisma";
 import ProductForm from "@/components/admin/ProductForm";
 import { updateProduct } from "../actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function EditProductPage({
   params,
 }: {
   params: { id: string };
 }) {
-  const product = await prisma.product.findUnique({ where: { id: params.id } });
+  const [product, categories] = await Promise.all([
+    prisma.product.findUnique({ where: { id: params.id } }),
+    prisma.category.findMany({ orderBy: { sortOrder: "asc" } }),
+  ]);
 
   if (!product) {
     notFound();
@@ -21,13 +26,14 @@ export default async function EditProductPage({
       <h1 className="mb-6 font-serif text-2xl text-emerald">Edit Product</h1>
       <ProductForm
         action={boundUpdate}
+        categories={categories.map((c) => ({ id: c.id, name: c.name }))}
         submitLabel="Save Changes"
         initialValues={{
           name: product.name,
-          category: product.category,
+          categoryId: product.categoryId,
           price: product.price,
           description: product.description,
-          imageUrl: product.imageUrl,
+          images: product.images,
           featured: product.featured,
         }}
       />

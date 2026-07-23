@@ -1,11 +1,15 @@
-import Image from "next/image";
-import { CURATOR_NAME, MISSION_STATEMENT } from "@/lib/site";
+import { CURATOR_NAME } from "@/lib/site";
+import { getSettings } from "@/lib/settings";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "About Crystal | Southern Luxury Glass",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { home } = await getSettings();
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <p className="text-center font-serif italic text-gold">About the Curator</p>
@@ -14,13 +18,13 @@ export default function AboutPage() {
       </h1>
 
       <div className="mt-10 flex justify-center">
-        <Image
-          src="/crystal-about.png"
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={home.aboutImageUrl}
           alt={CURATOR_NAME}
           width={320}
           height={400}
           className="rounded-lg object-cover shadow-md"
-          priority
         />
       </div>
 
@@ -47,7 +51,7 @@ export default function AboutPage() {
 
         <h2 className="font-serif text-2xl text-emerald">My Mission</h2>
         <p className="font-serif text-xl italic text-charcoal/80">
-          &ldquo;{MISSION_STATEMENT}&rdquo;
+          &ldquo;{home.missionStatement}&rdquo;
         </p>
 
         <p className="font-serif text-lg text-emerald">

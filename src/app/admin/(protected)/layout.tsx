@@ -17,6 +17,12 @@ export default function AdminProtectedLayout({
             <Link href="/admin/products" className="hover:text-emerald">
               Products
             </Link>
+            <Link href="/admin/categories" className="hover:text-emerald">
+              Categories
+            </Link>
+            <Link href="/admin/settings" className="hover:text-emerald">
+              Homepage
+            </Link>
             <Link href="/admin/events" className="hover:text-emerald">
               Live Shows
             </Link>

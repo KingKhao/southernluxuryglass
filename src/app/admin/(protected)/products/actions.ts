@@ -14,17 +14,32 @@ async function requireAdmin() {
 
 function readProductFields(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
-  const category = String(formData.get("category") ?? "").trim();
+  const categoryId = String(formData.get("categoryId") ?? "").trim();
   const price = Number(formData.get("price"));
   const description = String(formData.get("description") ?? "").trim();
-  const imageUrl = String(formData.get("imageUrl") ?? "").trim();
   const featured = formData.get("featured") === "on";
 
-  if (!name || !category || !description || !imageUrl || Number.isNaN(price)) {
-    throw new Error("All product fields are required and price must be a number.");
+  let images: string[] = [];
+  const rawImages = formData.get("images");
+  if (typeof rawImages === "string" && rawImages.trim() !== "") {
+    try {
+      const parsed = JSON.parse(rawImages);
+      if (Array.isArray(parsed)) {
+        images = parsed.filter((i): i is string => typeof i === "string" && i.trim() !== "");
+      }
+    } catch {
+      images = [];
+    }
   }
 
-  return { name, category, price, description, imageUrl, featured };
+  if (!name || !categoryId || !description || Number.isNaN(price)) {
+    throw new Error("Name, category, description and a numeric price are required.");
+  }
+  if (images.length === 0) {
+    throw new Error("Please add at least one product photo.");
+  }
+
+  return { name, categoryId, price, description, images, featured };
 }
 
 export async function createProduct(formData: FormData) {

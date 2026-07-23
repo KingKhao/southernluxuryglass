@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminProductsPage() {
   const products = await prisma.product.findMany({
     orderBy: { createdAt: "desc" },
+    include: { category: true },
   });
 
   return (
@@ -36,7 +37,7 @@ export default async function AdminProductsPage() {
             {products.map((product) => (
               <tr key={product.id} className="border-b border-emerald/10 last:border-0">
                 <td className="px-4 py-3 font-medium text-charcoal">{product.name}</td>
-                <td className="px-4 py-3 text-charcoal/70">{product.category}</td>
+                <td className="px-4 py-3 text-charcoal/70">{product.category.name}</td>
                 <td className="px-4 py-3 text-charcoal/70">${product.price.toFixed(2)}</td>
                 <td className="px-4 py-3">
                   <form action={toggleFeatured.bind(null, product.id, !product.featured)}>

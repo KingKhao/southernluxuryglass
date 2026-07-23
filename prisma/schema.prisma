@@ -8,13 +8,22 @@ datasource db {
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  sortOrder Int       @default(0)
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
 model Product {
   id          String   @id @default(cuid())
   name        String
-  category    String
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
   price       Float
   description String
-  imageUrl    String
+  images      String[] @default([])
   featured    Boolean  @default(false)
   createdAt   DateTime @default(now())
 }
@@ -32,4 +41,12 @@ model Admin {
   id           String @id @default(cuid())
   username     String @unique
   passwordHash String
+}
+
+// Generic key/value store for admin-editable site content:
+// homepage hero, mission, About Crystal section, and social links.
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
 }

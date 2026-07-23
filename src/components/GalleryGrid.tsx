@@ -9,14 +9,24 @@ type Product = {
   category: string;
   price: number;
   description: string;
-  imageUrl: string;
+  images: string[];
 };
 
-export default function GalleryGrid({ products }: { products: Product[] }) {
-  const categories = useMemo(
-    () => Array.from(new Set(products.map((p) => p.category))).sort(),
-    [products]
-  );
+export default function GalleryGrid({
+  products,
+  categoryOrder,
+}: {
+  products: Product[];
+  categoryOrder?: string[];
+}) {
+  const categories = useMemo(() => {
+    const present = new Set(products.map((p) => p.category));
+    if (categoryOrder && categoryOrder.length > 0) {
+      // Follow the admin-defined order; only show categories that have products.
+      return categoryOrder.filter((name) => present.has(name));
+    }
+    return Array.from(present).sort();
+  }, [products, categoryOrder]);
 
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [search, setSearch] = useState("");

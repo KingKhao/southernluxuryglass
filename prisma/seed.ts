@@ -3,14 +3,19 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+// Category display order (mirrors what shows in the gallery filters).
+const categories = ["Vases", "Glasses", "Serveware", "Decor", "Dinnerware"];
+
+// Demo inventory for the alpha build. Photos are branded placeholders — swap
+// them for Crystal's own photography (or royalty-free stock) from the admin.
 const products = [
   {
     name: "Emerald Depression Glass Compote",
     category: "Serveware",
     price: 68,
     description:
-      "A hand-blown emerald green compote dish from the 1930s, perfect for serving fruit or displaying trinkets. Minor surface wear consistent with age.",
-    imageUrl: "https://placehold.co/800x600/2F4A3D/FAF6EE?font=playfair-display&text=Emerald+Compote",
+      "A hand-blown emerald green compote from the 1930s, back when Depression glass was slipped free into cereal boxes and movie tickets. The color still catches the light beautifully; minor surface wear tells its ninety-year story.",
+    images: ["https://images.unsplash.com/photo-1712495023077-87b30e5ba50a?auto=format&fit=crop&w=1000&q=70"],
     featured: true,
   },
   {
@@ -18,8 +23,8 @@ const products = [
     category: "Vases",
     price: 145,
     description:
-      "A stunning ruby-to-clear cut glass vase with a scalloped rim, likely English, circa 1900. A true statement piece for any mantel.",
-    imageUrl: "https://placehold.co/800x600/7B2D3E/FAF6EE?font=playfair-display&text=Cranberry+Vase",
+      "A ruby-to-clear cut glass vase with a scalloped rim, likely English and circa 1900. The cranberry hue was achieved by adding real gold to the molten glass — a true statement piece for a mantel.",
+    images: ["https://images.unsplash.com/photo-1598995651120-2f3150be6cf4?auto=format&fit=crop&w=1000&q=70"],
     featured: true,
   },
   {
@@ -27,8 +32,8 @@ const products = [
     category: "Glasses",
     price: 92,
     description:
-      "Delicate hand-etched cordial glasses with a floral vine motif, each holding about 2 oz. A lovely addition to any formal table setting.",
-    imageUrl: "https://placehold.co/800x600/B08D57/2A2621?font=playfair-display&text=Cordial+Glasses",
+      "Six delicate cordial glasses, each hand-etched with a trailing floral vine and holding about two ounces. Rescued from a Charleston estate sale, they're made for after-dinner sherry and good conversation.",
+    images: ["https://images.unsplash.com/photo-1667173199918-0873ae8dab40?auto=format&fit=crop&w=1000&q=70"],
     featured: true,
   },
   {
@@ -36,8 +41,8 @@ const products = [
     category: "Decor",
     price: 38,
     description:
-      "Classic hobnail-pattern milk glass bowl in excellent condition, great for candy, potpourri, or as a standalone decorative piece.",
-    imageUrl: "https://placehold.co/800x600/F3ECDD/2A2621?font=playfair-display&text=Hobnail+Bowl",
+      "A classic Fenton-style hobnail bowl in creamy milk glass, its raised dots as crisp as the day it was pressed. Excellent condition — lovely for candy, potpourri, or simply catching the afternoon sun.",
+    images: ["https://images.unsplash.com/photo-1636389896270-4054a6c5bcdd?auto=format&fit=crop&w=1000&q=70"],
     featured: false,
   },
   {
@@ -45,8 +50,8 @@ const products = [
     category: "Dinnerware",
     price: 210,
     description:
-      "An 8-piece amber pressed glass dinnerware set including plates and bowls, sold as a matched set from a 1970s estate collection.",
-    imageUrl: "https://placehold.co/800x600/A8752E/FAF6EE?font=playfair-display&text=Amber+Dinnerware",
+      "An eight-piece amber pressed-glass dinnerware set from a 1970s estate, sold as a matched collection. The warm honey tone makes an autumn table glow — plates and bowls, all free of chips.",
+    images: ["https://images.unsplash.com/photo-1647036939425-caa6365bb8f9?auto=format&fit=crop&w=1000&q=70"],
     featured: false,
   },
   {
@@ -54,8 +59,8 @@ const products = [
     category: "Serveware",
     price: 175,
     description:
-      "A radiant iridescent carnival glass pitcher by Fenton, featuring a grape-and-leaf pattern. A collector favorite in wonderful condition.",
-    imageUrl: "https://placehold.co/800x600/2F4A3D/FAF6EE?font=playfair-display&text=Carnival+Pitcher",
+      "A radiant iridescent pitcher by Fenton in a grape-and-leaf pattern, its oil-on-water shimmer earning carnival glass the nickname 'the poor man's Tiffany.' A collector favorite in wonderful condition.",
+    images: ["https://images.unsplash.com/photo-1774294731362-a0b75597c94d?auto=format&fit=crop&w=1000&q=70"],
     featured: false,
   },
   {
@@ -63,8 +68,8 @@ const products = [
     category: "Vases",
     price: 88,
     description:
-      "A sleek smoked-glass vase with clean geometric lines, embodying the Art Deco aesthetic of the 1920s-30s.",
-    imageUrl: "https://placehold.co/800x600/3F3B36/FAF6EE?font=playfair-display&text=Smoked+Vase",
+      "A sleek smoked-glass vase with clean geometric lines, straight out of the 1920s–30s Art Deco moment. The subtle grey tint reads modern and antique all at once.",
+    images: ["https://images.unsplash.com/photo-1712245833868-752590cb07e1?auto=format&fit=crop&w=1000&q=70"],
     featured: false,
   },
   {
@@ -72,8 +77,8 @@ const products = [
     category: "Decor",
     price: 130,
     description:
-      "A petite decanter hand-painted with gold filigree detailing, a charming accent for a bar cart or curio cabinet.",
-    imageUrl: "https://placehold.co/800x600/B08D57/2A2621?font=playfair-display&text=Cordial+Decanter",
+      "A petite decanter hand-painted with gold filigree, the gilt still bright along its stopper. A charming accent for a bar cart or curio cabinet — equal parts pretty and practical.",
+    images: ["https://images.unsplash.com/photo-1589807502973-c7be2ee95d99?auto=format&fit=crop&w=1000&q=70"],
     featured: false,
   },
   {
@@ -81,8 +86,8 @@ const products = [
     category: "Glasses",
     price: 54,
     description:
-      "A set of four matching pressed glass tumblers with a diamond-point pattern, sturdy and full of everyday vintage charm.",
-    imageUrl: "https://placehold.co/800x600/2F4A3D/FAF6EE?font=playfair-display&text=Pressed+Tumblers",
+      "Four matching tumblers in a crisp diamond-point pattern, sturdy enough for everyday and pretty enough for company. Honest vintage charm with no chips or cloudiness.",
+    images: ["https://images.unsplash.com/photo-1659815146192-6e92d977548a?auto=format&fit=crop&w=1000&q=70"],
     featured: false,
   },
   {
@@ -90,8 +95,8 @@ const products = [
     category: "Serveware",
     price: 76,
     description:
-      "A pale pink Depression glass cake stand with a scalloped edge — as lovely for display as it is for serving.",
-    imageUrl: "https://placehold.co/800x600/D9A6AE/2A2621?font=playfair-display&text=Cake+Stand",
+      "A pale pink Depression glass cake stand with a scalloped edge, the kind that held Sunday layer cakes for generations. As lovely holding fruit or jewelry as it is a dessert.",
+    images: ["https://images.unsplash.com/photo-1647036939635-c95119966b24?auto=format&fit=crop&w=1000&q=70"],
     featured: false,
   },
 ];
@@ -119,21 +124,42 @@ const events = [
 
 async function main() {
   await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
   await prisma.event.deleteMany();
   await prisma.admin.deleteMany();
 
-  await prisma.product.createMany({ data: products });
+  const categoryIdByName: Record<string, string> = {};
+  for (let i = 0; i < categories.length; i++) {
+    const created = await prisma.category.create({
+      data: { name: categories[i], sortOrder: i },
+    });
+    categoryIdByName[categories[i]] = created.id;
+  }
+
+  for (const p of products) {
+    await prisma.product.create({
+      data: {
+        name: p.name,
+        price: p.price,
+        description: p.description,
+        images: p.images,
+        featured: p.featured,
+        categoryId: categoryIdByName[p.category],
+      },
+    });
+  }
+
   await prisma.event.createMany({ data: events });
 
   const username = process.env.ADMIN_USERNAME ?? "crystal";
   const password = process.env.ADMIN_PASSWORD ?? "changeme123";
   const passwordHash = await bcrypt.hash(password, 10);
 
-  await prisma.admin.create({
-    data: { username, passwordHash },
-  });
+  await prisma.admin.create({ data: { username, passwordHash } });
 
-  console.log(`Seeded ${products.length} products and ${events.length} events.`);
+  console.log(
+    `Seeded ${categories.length} categories, ${products.length} products and ${events.length} events.`
+  );
   console.log(`Admin login -> username: "${username}", password: "${password}"`);
 }
 
