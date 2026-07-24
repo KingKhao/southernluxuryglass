@@ -1,11 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { uploadImage } from "@/lib/uploadClient";
 
 type ProductFormValues = {
   name: string;
   categoryId: string;
   price: number;
+  cost?: number | null;
   description: string;
   images: string[];
   featured: boolean;
@@ -46,16 +48,12 @@ export default function ProductForm({
           setError("Only image files can be uploaded.");
           continue;
         }
-        const formData = new FormData();
-        formData.set("file", file);
-        formData.set("folder", "products");
-        const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-        const data = await res.json();
-        if (!res.ok) {
-          setError(data.error || "Image upload failed.");
-          continue;
+        try {
+          const url = await uploadImage(file, "products");
+          uploaded.push(url);
+        } catch (err) {
+          setError((err as Error).message || "Image upload failed.");
         }
-        uploaded.push(data.url);
       }
       if (uploaded.length > 0) setImages((prev) => [...prev, ...uploaded]);
     } finally {
@@ -119,6 +117,25 @@ export default function ProductForm({
             className={fieldClass}
           />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm text-charcoal/70" htmlFor="cost">
+          Your cost (admin-only)
+        </label>
+        <input
+          id="cost"
+          name="cost"
+          type="number"
+          step="0.01"
+          min="0"
+          defaultValue={initialValues?.cost ?? ""}
+          placeholder="What you paid for this piece"
+          className={fieldClass}
+        />
+        <p className="mt-1 text-xs text-charcoal/50">
+          Only you see this — it never appears on the storefront.
+        </p>
       </div>
 
       {/* Photos: drag-and-drop upload + thumbnails */}

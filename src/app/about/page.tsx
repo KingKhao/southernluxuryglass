@@ -60,13 +60,6 @@ export default async function AboutPage() {
           Crystal ♡
         </p>
       </div>
-
-      <div className="mt-12 rounded-lg border border-gold/40 bg-gold/10 px-5 py-3 text-center text-sm text-charcoal/70">
-        This page uses Crystal&apos;s own words from her curator bio. If
-        there&apos;s more of the story you&apos;d like to add — how you got
-        started, favorite finds, behind-the-scenes details — just let me know
-        and we&apos;ll expand this page.
-      </div>
     </div>
   );
 }

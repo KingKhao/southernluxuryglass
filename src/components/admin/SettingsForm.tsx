@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { SettingsShape } from "@/lib/settings";
+import { uploadImage } from "@/lib/uploadClient";
 
 const fieldClass =
   "mt-1 w-full rounded-md border border-emerald/30 bg-white/70 px-3 py-2 text-sm focus:border-emerald focus:outline-none";
@@ -24,26 +25,29 @@ export default function SettingsForm({
     value: SettingsShape["home"][K]
   ) => setSettings((s) => ({ ...s, home: { ...s.home, [key]: value } }));
 
-  const setSocial = <K extends keyof SettingsShape["social"]>(
-    key: K,
-    value: SettingsShape["social"][K]
-  ) => setSettings((s) => ({ ...s, social: { ...s.social, [key]: value } }));
+  type LinkKey = "instagram" | "tiktok" | "pinterest" | "linkedin" | "whatnot";
+
+  const setLink = (key: LinkKey, patch: Partial<{ url: string; enabled: boolean }>) =>
+    setSettings((s) => ({
+      ...s,
+      social: { ...s.social, [key]: { ...s.social[key], ...patch } },
+    }));
+
+  const setEmail = (patch: Partial<{ address: string; enabled: boolean }>) =>
+    setSettings((s) => ({
+      ...s,
+      social: { ...s.social, email: { ...s.social.email, ...patch } },
+    }));
 
   const uploadAboutImage = async (file: File | undefined) => {
     if (!file) return;
     setUploading(true);
     setStatus(null);
     try {
-      const fd = new FormData();
-      fd.set("file", file);
-      fd.set("folder", "about");
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) {
-        setStatus(data.error || "Image upload failed.");
-        return;
-      }
-      setHome("aboutImageUrl", data.url);
+      const url = await uploadImage(file, "about");
+      setHome("aboutImageUrl", url);
+    } catch (err) {
+      setStatus((err as Error).message || "Image upload failed.");
     } finally {
       setUploading(false);
     }
@@ -151,20 +155,46 @@ export default function SettingsForm({
       <div className={section}>
         <h2 className="mb-1 font-serif text-lg text-emerald">Social Links</h2>
         <p className="mb-3 text-xs text-charcoal/50">
-          Paste the full URL to each profile. Leave a field blank to show it as
-          &ldquo;coming soon&rdquo; in the footer.
+          Paste the full URL to each profile, then tick the box to show it in the footer.
+          Unticked links are hidden.
         </p>
-        {(["instagram", "linkedin", "pinterest", "whatnot"] as const).map((key) => (
-          <div key={key} className="mt-2">
-            <label className={`${labelClass} capitalize`}>{key}</label>
+        {(["instagram", "tiktok", "pinterest", "linkedin", "whatnot"] as const).map((key) => (
+          <div key={key} className="mt-3">
+            <label className="flex items-center gap-2 text-sm font-medium capitalize text-charcoal/80">
+              <input
+                type="checkbox"
+                checked={settings.social[key].enabled}
+                onChange={(e) => setLink(key, { enabled: e.target.checked })}
+                className="h-4 w-4 rounded border-emerald/30"
+              />
+              {key}
+            </label>
             <input
               className={fieldClass}
               placeholder="https://…"
-              value={settings.social[key]}
-              onChange={(e) => setSocial(key, e.target.value)}
+              value={settings.social[key].url}
+              onChange={(e) => setLink(key, { url: e.target.value })}
             />
           </div>
         ))}
+        <div className="mt-3">
+          <label className="flex items-center gap-2 text-sm font-medium text-charcoal/80">
+            <input
+              type="checkbox"
+              checked={settings.social.email.enabled}
+              onChange={(e) => setEmail({ enabled: e.target.checked })}
+              className="h-4 w-4 rounded border-emerald/30"
+            />
+            Email
+          </label>
+          <input
+            className={fieldClass}
+            type="email"
+            placeholder="hello@southernluxuryglass.com"
+            value={settings.social.email.address}
+            onChange={(e) => setEmail({ address: e.target.value })}
+          />
+        </div>
       </div>
 
       <div className="flex items-center gap-3">

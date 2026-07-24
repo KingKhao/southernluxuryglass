@@ -22,6 +22,7 @@ model Product {
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id])
   price       Float
+  cost        Float?
   description String
   images      String[] @default([])
   featured    Boolean  @default(false)
@@ -49,4 +50,20 @@ model Setting {
   key       String   @id
   value     Json
   updatedAt DateTime @updatedAt
+}
+
+// Customer inquiries submitted from the "Inquire About This Piece" form.
+model Inquiry {
+  id          String   @id @default(cuid())
+  productId   String?
+  productName String
+  name        String
+  phone       String
+  email       String
+  message     String
+  createdAt   DateTime @default(now())
+
+  @@index([email])
+  @@index([phone])
+  @@index([createdAt])
 }

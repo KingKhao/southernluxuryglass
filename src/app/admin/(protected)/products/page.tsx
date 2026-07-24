@@ -29,6 +29,7 @@ export default async function AdminProductsPage() {
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Category</th>
               <th className="px-4 py-3">Price</th>
+              <th className="px-4 py-3">Cost</th>
               <th className="px-4 py-3">Featured</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
@@ -39,6 +40,9 @@ export default async function AdminProductsPage() {
                 <td className="px-4 py-3 font-medium text-charcoal">{product.name}</td>
                 <td className="px-4 py-3 text-charcoal/70">{product.category.name}</td>
                 <td className="px-4 py-3 text-charcoal/70">${product.price.toFixed(2)}</td>
+                <td className="px-4 py-3 text-charcoal/50">
+                  {product.cost != null ? `$${product.cost.toFixed(2)}` : "—"}
+                </td>
                 <td className="px-4 py-3">
                   <form action={toggleFeatured.bind(null, product.id, !product.featured)}>
                     <button
@@ -73,7 +77,7 @@ export default async function AdminProductsPage() {
             ))}
             {products.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-charcoal/60">
+                <td colSpan={6} className="px-4 py-6 text-center text-charcoal/60">
                   No products yet. Add your first piece above.
                 </td>
               </tr>

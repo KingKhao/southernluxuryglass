@@ -14,17 +14,20 @@ export default function AdminProtectedLayout({
             Admin Dashboard
           </Link>
           <nav className="flex gap-4 text-sm text-charcoal/70">
-            <Link href="/admin/products" className="hover:text-emerald">
-              Products
+            <Link href="/admin/settings" className="hover:text-emerald">
+              Homepage
             </Link>
             <Link href="/admin/categories" className="hover:text-emerald">
               Categories
             </Link>
-            <Link href="/admin/settings" className="hover:text-emerald">
-              Homepage
+            <Link href="/admin/products" className="hover:text-emerald">
+              Products
             </Link>
             <Link href="/admin/events" className="hover:text-emerald">
               Live Shows
+            </Link>
+            <Link href="/admin/inquiries" className="hover:text-emerald">
+              Inquiries
             </Link>
           </nav>
         </div>

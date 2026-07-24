@@ -2,15 +2,20 @@ import Link from "next/link";
 import { SITE_NAME } from "@/lib/site";
 import { getSettings } from "@/lib/settings";
 
-const PLATFORMS: { key: "instagram" | "linkedin" | "pinterest" | "whatnot"; label: string }[] = [
+const PLATFORMS: { key: "instagram" | "tiktok" | "pinterest" | "linkedin" | "whatnot"; label: string }[] = [
   { key: "instagram", label: "Instagram" },
-  { key: "linkedin", label: "LinkedIn" },
+  { key: "tiktok", label: "TikTok" },
   { key: "pinterest", label: "Pinterest" },
+  { key: "linkedin", label: "LinkedIn" },
   { key: "whatnot", label: "Whatnot" },
 ];
 
 export default async function Footer() {
   const { social } = await getSettings();
+
+  const activeLinks = PLATFORMS.filter((p) => social[p.key].enabled && social[p.key].url.trim() !== "");
+  const showEmail = social.email.enabled && social.email.address.trim() !== "";
+  const hasAny = activeLinks.length > 0 || showEmail;
 
   return (
     <footer className="border-t border-emerald/10 bg-emerald text-cream">
@@ -29,30 +34,28 @@ export default async function Footer() {
               Follow &amp; Watch Live
             </p>
             <ul className="mt-3 space-y-2 text-sm">
-              {PLATFORMS.map((platform) => {
-                const href = social[platform.key]?.trim();
-                return (
-                  <li key={platform.key}>
-                    {href ? (
-                      <Link
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-gold-light"
-                      >
-                        {platform.label}
-                      </Link>
-                    ) : (
-                      <span className="text-cream/70">
-                        {platform.label}
-                        <span className="ml-2 text-xs italic text-cream/40">
-                          (coming soon)
-                        </span>
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
+              {activeLinks.map((platform) => (
+                <li key={platform.key}>
+                  <Link
+                    href={social[platform.key].url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-gold-light"
+                  >
+                    {platform.label}
+                  </Link>
+                </li>
+              ))}
+              {showEmail && (
+                <li>
+                  <a href={`mailto:${social.email.address}`} className="hover:text-gold-light">
+                    Email
+                  </a>
+                </li>
+              )}
+              {!hasAny && (
+                <li className="text-xs italic text-cream/40">Links coming soon</li>
+              )}
             </ul>
           </div>
         </div>

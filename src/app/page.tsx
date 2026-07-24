@@ -70,6 +70,13 @@ export default async function HomePage() {
         )}
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <h2 className="mb-8 text-center font-serif text-2xl text-emerald">
+          Upcoming Live Shows
+        </h2>
+        <EventSchedule events={upcomingEvents} />
+      </section>
+
       <section className="bg-ivory px-6 py-16">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="font-serif text-2xl text-emerald">Our Mission</h2>
@@ -102,13 +109,6 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <h2 className="mb-8 text-center font-serif text-2xl text-emerald">
-          Upcoming Live Shows
-        </h2>
-        <EventSchedule events={upcomingEvents} />
       </section>
     </div>
   );

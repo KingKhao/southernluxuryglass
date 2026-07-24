@@ -16,6 +16,8 @@ function readProductFields(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const categoryId = String(formData.get("categoryId") ?? "").trim();
   const price = Number(formData.get("price"));
+  const rawCost = String(formData.get("cost") ?? "").trim();
+  const cost = rawCost === "" ? null : Number(rawCost);
   const description = String(formData.get("description") ?? "").trim();
   const featured = formData.get("featured") === "on";
 
@@ -35,11 +37,14 @@ function readProductFields(formData: FormData) {
   if (!name || !categoryId || !description || Number.isNaN(price)) {
     throw new Error("Name, category, description and a numeric price are required.");
   }
+  if (cost !== null && Number.isNaN(cost)) {
+    throw new Error("Cost must be a number.");
+  }
   if (images.length === 0) {
     throw new Error("Please add at least one product photo.");
   }
 
-  return { name, categoryId, price, description, images, featured };
+  return { name, categoryId, price, cost, description, images, featured };
 }
 
 export async function createProduct(formData: FormData) {

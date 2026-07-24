@@ -1,11 +1,16 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 
-export type SocialLinksSetting = {
-  instagram: string;
-  linkedin: string;
-  pinterest: string;
-  whatnot: string;
+export type SocialLink = { url: string; enabled: boolean };
+export type EmailLink = { address: string; enabled: boolean };
+
+export type SocialSetting = {
+  instagram: SocialLink;
+  tiktok: SocialLink;
+  pinterest: SocialLink;
+  linkedin: SocialLink;
+  whatnot: SocialLink;
+  email: EmailLink;
 };
 
 export type HomeContentSetting = {
@@ -20,7 +25,7 @@ export type HomeContentSetting = {
 
 export type SettingsShape = {
   home: HomeContentSetting;
-  social: SocialLinksSetting;
+  social: SocialSetting;
 };
 
 export const SETTINGS_DEFAULTS: SettingsShape = {
@@ -37,14 +42,48 @@ export const SETTINGS_DEFAULTS: SettingsShape = {
     aboutImageUrl: "/crystal-home.png",
   },
   social: {
-    instagram: "",
-    linkedin: "",
-    pinterest: "",
-    whatnot: "",
+    instagram: { url: "", enabled: false },
+    tiktok: { url: "", enabled: false },
+    pinterest: { url: "", enabled: false },
+    linkedin: { url: "", enabled: false },
+    whatnot: { url: "", enabled: false },
+    email: { address: "", enabled: false },
   },
 };
 
 export type SettingKey = keyof SettingsShape;
+
+// Accepts both the old string format ("https://…") and the new {url, enabled}
+// object format, so settings saved before toggles existed still work.
+function toLink(value: unknown): SocialLink {
+  if (typeof value === "string") return { url: value, enabled: value.trim() !== "" };
+  if (value && typeof value === "object") {
+    const v = value as Record<string, unknown>;
+    return { url: String(v.url ?? ""), enabled: Boolean(v.enabled) };
+  }
+  return { url: "", enabled: false };
+}
+
+function toEmailLink(value: unknown): EmailLink {
+  if (typeof value === "string") return { address: value, enabled: value.trim() !== "" };
+  if (value && typeof value === "object") {
+    const v = value as Record<string, unknown>;
+    return { address: String(v.address ?? ""), enabled: Boolean(v.enabled) };
+  }
+  return { address: "", enabled: false };
+}
+
+function normalizeSocial(stored: unknown): SocialSetting {
+  const s = (stored ?? {}) as Record<string, unknown>;
+  return {
+    instagram: toLink(s.instagram),
+    tiktok: toLink(s.tiktok),
+    pinterest: toLink(s.pinterest),
+    linkedin: toLink(s.linkedin),
+    whatnot: toLink(s.whatnot),
+    email: toEmailLink(s.email),
+  };
+}
 
 export async function getSettings(): Promise<SettingsShape> {
   const rows = await prisma.setting.findMany();
@@ -52,7 +91,7 @@ export async function getSettings(): Promise<SettingsShape> {
 
   return {
     home: { ...SETTINGS_DEFAULTS.home, ...(map.get("home") as object | undefined) },
-    social: { ...SETTINGS_DEFAULTS.social, ...(map.get("social") as object | undefined) },
+    social: normalizeSocial(map.get("social")),
   };
 }
 
