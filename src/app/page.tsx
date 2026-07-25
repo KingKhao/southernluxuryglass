@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/ProductCard";
 import EventSchedule from "@/components/EventSchedule";
+import ContactSection from "@/components/ContactSection";
 import { getSettings } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
@@ -110,6 +111,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <ContactSection />
     </div>
   );
 }

@@ -17,6 +17,9 @@ export default function AdminProtectedLayout({
             <Link href="/admin/settings" className="hover:text-emerald">
               Homepage
             </Link>
+            <Link href="/admin/about" className="hover:text-emerald">
+              About Crystal
+            </Link>
             <Link href="/admin/categories" className="hover:text-emerald">
               Categories
             </Link>
@@ -28,6 +31,9 @@ export default function AdminProtectedLayout({
             </Link>
             <Link href="/admin/inquiries" className="hover:text-emerald">
               Inquiries
+            </Link>
+            <Link href="/admin/contacts" className="hover:text-emerald">
+              Contacts
             </Link>
           </nav>
         </div>

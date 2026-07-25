@@ -67,3 +67,34 @@ model Inquiry {
   @@index([phone])
   @@index([createdAt])
 }
+
+enum ContactCategory {
+  NEW
+  FOLLOWER
+  BUYER
+  B2B
+}
+
+// CRM contact record. Auto-created from inquiries (deduped by email) and
+// manually addable by Crystal.
+model Contact {
+  id                String          @id @default(cuid())
+  name              String
+  phone             String
+  email             String
+  productOfInterest String?
+  category          ContactCategory @default(NEW)
+  notes             ContactNote[]
+  createdAt         DateTime        @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+model ContactNote {
+  id        String   @id @default(cuid())
+  contactId String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+}

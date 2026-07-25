@@ -23,9 +23,16 @@ export type HomeContentSetting = {
   aboutImageUrl: string;
 };
 
+export type AboutSetting = {
+  imageUrl: string;
+  intro: string;
+  mission: string;
+};
+
 export type SettingsShape = {
   home: HomeContentSetting;
   social: SocialSetting;
+  about: AboutSetting;
 };
 
 export const SETTINGS_DEFAULTS: SettingsShape = {
@@ -48,6 +55,13 @@ export const SETTINGS_DEFAULTS: SettingsShape = {
     linkedin: { url: "", enabled: false },
     whatnot: { url: "", enabled: false },
     email: { address: "", enabled: false },
+  },
+  about: {
+    imageUrl: "/crystal-about.png",
+    intro:
+      "My love for beautiful things started long before Southern Luxury Glass became a reality. Growing up in the South, I was surrounded by tradition, hospitality, and a deep appreciation for the details that make a house a home.\n\nOver the years, my passion for fine glassware and timeless design only grew. I believe that every piece tells a story — and my mission is to help you find the pieces that become part of yours.\n\nAt Southern Luxury Glass, I carefully curate each item with an eye for quality, elegance, and charm. Whether you're setting a table for a special occasion or adding a little beauty to your everyday, I'm honored to be a part of your journey.",
+    mission:
+      "Every piece tells a story — my mission is to help you find the pieces that become part of yours.",
   },
 };
 
@@ -92,6 +106,7 @@ export async function getSettings(): Promise<SettingsShape> {
   return {
     home: { ...SETTINGS_DEFAULTS.home, ...(map.get("home") as object | undefined) },
     social: normalizeSocial(map.get("social")),
+    about: { ...SETTINGS_DEFAULTS.about, ...(map.get("about") as object | undefined) },
   };
 }
 

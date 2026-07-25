@@ -7,17 +7,21 @@ const MAX_MESSAGE = 2000;
 export default function InquiryModal({
   productName,
   productId,
+  general = false,
   onClose,
 }: {
   productName: string;
   productId?: string;
+  general?: boolean;
   onClose: () => void;
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState(
-    `Hi Crystal, I'm interested in the "${productName}". Could you tell me more about it?`
+    general
+      ? "Hi Crystal, I'd love to get in touch about "
+      : `Hi Crystal, I'm interested in the "${productName}". Could you tell me more about it?`
   );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,8 +66,10 @@ export default function InquiryModal({
       >
         <div className="mb-4 flex items-start justify-between">
           <div>
-            <h2 className="font-serif text-xl text-emerald">Inquire About This Piece</h2>
-            <p className="text-sm text-charcoal/60">{productName}</p>
+            <h2 className="font-serif text-xl text-emerald">
+              {general ? "Contact Crystal" : "Inquire About This Piece"}
+            </h2>
+            {!general && <p className="text-sm text-charcoal/60">{productName}</p>}
           </div>
           <button
             type="button"

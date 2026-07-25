@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSettings, setSetting, type SettingKey } from "@/lib/settings";
 import { getSessionUsername } from "@/lib/session";
 
-const KEYS: SettingKey[] = ["home", "social"];
+const KEYS: SettingKey[] = ["home", "social", "about"];
 
 export async function GET() {
   if (!(await getSessionUsername())) {

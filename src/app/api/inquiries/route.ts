@@ -51,5 +51,20 @@ export async function POST(req: NextRequest) {
     data: { productId, productName, name, phone, email, message },
   });
 
+  // Auto-create a CRM contact (one per email). Existing contacts are left as-is
+  // so Crystal's category/notes are never overwritten by a new inquiry.
+  const existing = await prisma.contact.findFirst({ where: { email } });
+  if (!existing) {
+    await prisma.contact.create({
+      data: {
+        name,
+        phone,
+        email,
+        productOfInterest: productName,
+        // category defaults to NEW
+      },
+    });
+  }
+
   return NextResponse.json({ ok: true });
 }
