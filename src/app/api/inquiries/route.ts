@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordContactSubmission } from "@/lib/contacts";
 
 const MAX_PER_WINDOW = 10;
 const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
@@ -51,20 +52,15 @@ export async function POST(req: NextRequest) {
     data: { productId, productName, name, phone, email, message },
   });
 
-  // Auto-create a CRM contact (one per email). Existing contacts are left as-is
-  // so Crystal's category/notes are never overwritten by a new inquiry.
-  const existing = await prisma.contact.findFirst({ where: { email } });
-  if (!existing) {
-    await prisma.contact.create({
-      data: {
-        name,
-        phone,
-        email,
-        productOfInterest: productName,
-        // category defaults to NEW
-      },
-    });
-  }
+  // Auto-merge into Contacts by email and append a permanent history entry.
+  await recordContactSubmission({
+    name,
+    email,
+    phone,
+    source: productId ? "inquiry" : "contact-me",
+    summary: productName,
+    detail: message,
+  });
 
   return NextResponse.json({ ok: true });
 }

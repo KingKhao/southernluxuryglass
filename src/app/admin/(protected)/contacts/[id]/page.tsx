@@ -18,7 +18,10 @@ export default async function ContactDetailPage({
 }) {
   const contact = await prisma.contact.findUnique({
     where: { id: params.id },
-    include: { notes: { orderBy: { createdAt: "desc" } } },
+    include: {
+      notes: { orderBy: { createdAt: "desc" } },
+      history: { orderBy: { createdAt: "desc" } },
+    },
   });
 
   if (!contact) notFound();
@@ -75,6 +78,35 @@ export default async function ContactDetailPage({
             Save
           </button>
         </form>
+      </div>
+
+      {/* Inquiry history — permanent record, never removed by deleting an inquiry */}
+      <div className="mt-6 rounded-lg border border-emerald/15 bg-white/60 p-4">
+        <p className="mb-3 text-sm font-medium text-charcoal/80">
+          Inquiry history{" "}
+          <span className="font-normal text-charcoal/40">
+            (permanent — kept even if an inquiry is deleted)
+          </span>
+        </p>
+        <ul className="space-y-3">
+          {contact.history.length === 0 && (
+            <li className="text-sm text-charcoal/50">No history yet.</li>
+          )}
+          {contact.history.map((h) => (
+            <li key={h.id} className="rounded-md border border-emerald/10 bg-white/70 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium text-charcoal/80">{h.summary}</p>
+                <span className="rounded-full bg-charcoal/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-charcoal/40">
+                  {h.source}
+                </span>
+              </div>
+              {h.detail && (
+                <p className="mt-1 whitespace-pre-wrap text-sm text-charcoal/70">{h.detail}</p>
+              )}
+              <p className="mt-1 text-xs text-charcoal/40">{h.createdAt.toLocaleString()}</p>
+            </li>
+          ))}
+        </ul>
       </div>
 
       {/* Notes */}

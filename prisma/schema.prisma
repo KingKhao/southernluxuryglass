@@ -54,6 +54,7 @@ model Setting {
 
 enum InquiryStatus {
   NEW
+  WORKING_LEAD
   SERIOUS_BUYER
 }
 
@@ -84,17 +85,32 @@ enum ContactCategory {
 // CRM contact record. Auto-created from inquiries (deduped by email) and
 // manually addable by Crystal.
 model Contact {
-  id                String          @id @default(cuid())
+  id                String           @id @default(cuid())
   name              String
   phone             String
   email             String
   productOfInterest String?
-  category          ContactCategory @default(NEW)
+  category          ContactCategory  @default(NEW)
   notes             ContactNote[]
-  createdAt         DateTime        @default(now())
+  history           ContactHistory[]
+  createdAt         DateTime         @default(now())
 
   @@index([email])
   @@index([createdAt])
+}
+
+// Permanent record of every submission a contact ever made. Deliberately NOT
+// linked to Inquiry — deleting an active inquiry never removes history here.
+model ContactHistory {
+  id        String   @id @default(cuid())
+  contactId String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  source    String   // "inquiry" | "signup" | "contact-me" | "manual"
+  summary   String   // e.g. product name or "Early-access signup"
+  detail    String?  // the message, if any
+  createdAt DateTime @default(now())
+
+  @@index([contactId])
 }
 
 model ContactNote {

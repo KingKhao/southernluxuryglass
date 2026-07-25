@@ -8,24 +8,25 @@ export const dynamic = "force-dynamic";
 const TABS = [
   { key: "all", label: "All" },
   { key: "new", label: "New" },
+  { key: "working", label: "Working Lead" },
   { key: "serious", label: "Serious Buyers" },
 ] as const;
+
+const FILTER_STATUS: Record<string, Prisma.InquiryWhereInput> = {
+  new: { status: "NEW" },
+  working: { status: "WORKING_LEAD" },
+  serious: { status: "SERIOUS_BUYER" },
+};
 
 export default async function AdminInquiriesPage({
   searchParams,
 }: {
   searchParams: { filter?: string };
 }) {
-  const filter = searchParams.filter === "new" || searchParams.filter === "serious"
-    ? searchParams.filter
-    : "all";
+  const filter =
+    searchParams.filter && FILTER_STATUS[searchParams.filter] ? searchParams.filter : "all";
 
-  const where: Prisma.InquiryWhereInput =
-    filter === "new"
-      ? { status: "NEW" }
-      : filter === "serious"
-        ? { status: "SERIOUS_BUYER" }
-        : {};
+  const where: Prisma.InquiryWhereInput = FILTER_STATUS[filter] ?? {};
 
   const inquiries = await prisma.inquiry.findMany({
     where,

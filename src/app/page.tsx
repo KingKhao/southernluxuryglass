@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/ProductCard";
 import EventSchedule from "@/components/EventSchedule";
 import ContactSection from "@/components/ContactSection";
+import SignupSection from "@/components/SignupSection";
+import SignupPopup from "@/components/SignupPopup";
 import { getSettings } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
@@ -71,7 +73,7 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section id="live-shows" className="mx-auto max-w-6xl px-6 py-16">
         <h2 className="mb-8 text-center font-serif text-2xl text-emerald">
           Upcoming Live Shows
         </h2>
@@ -113,6 +115,10 @@ export default async function HomePage() {
       </section>
 
       <ContactSection />
+
+      <SignupSection />
+
+      <SignupPopup />
     </div>
   );
 }

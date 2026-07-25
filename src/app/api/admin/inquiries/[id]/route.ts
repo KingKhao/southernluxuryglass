@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUsername } from "@/lib/session";
 import type { InquiryStatus } from "@prisma/client";
 
-const STATUSES: InquiryStatus[] = ["NEW", "SERIOUS_BUYER"];
+// An inquiry can only move TO Working Lead or Serious Buyer — never back to New.
+const ALLOWED_TARGETS: InquiryStatus[] = ["WORKING_LEAD", "SERIOUS_BUYER"];
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   if (!(await getSessionUsername())) {
@@ -16,8 +17,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   } catch {
     // no body
   }
-  if (!STATUSES.includes(status as InquiryStatus)) {
-    return NextResponse.json({ error: "Invalid status." }, { status: 400 });
+  if (!ALLOWED_TARGETS.includes(status as InquiryStatus)) {
+    return NextResponse.json(
+      { error: "An inquiry can only move to Working Lead or Serious Buyer." },
+      { status: 400 }
+    );
   }
   await prisma.inquiry.update({
     where: { id: params.id },

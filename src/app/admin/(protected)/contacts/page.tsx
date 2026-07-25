@@ -48,7 +48,15 @@ export default async function AdminContactsPage({
 
   return (
     <div>
-      <h1 className="mb-2 font-serif text-2xl text-emerald">Contacts</h1>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-serif text-2xl text-emerald">Contacts</h1>
+        <a
+          href="/api/admin/contacts/export"
+          className="rounded-full border border-emerald px-4 py-2 text-sm text-emerald hover:bg-emerald hover:text-cream"
+        >
+          Export Contacts to CSV
+        </a>
+      </div>
       <p className="mb-4 text-sm text-charcoal/60">
         Everyone who has reached out, plus anyone you add by hand. Sorted A–Z.
       </p>

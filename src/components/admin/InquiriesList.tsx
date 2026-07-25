@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+type Status = "NEW" | "WORKING_LEAD" | "SERIOUS_BUYER";
+
 type Inquiry = {
   id: string;
   productName: string;
@@ -10,13 +12,20 @@ type Inquiry = {
   phone: string;
   email: string;
   message: string;
-  status: "NEW" | "SERIOUS_BUYER";
+  status: Status;
   createdAt: string;
 };
 
-const STATUS_LABEL: Record<Inquiry["status"], string> = {
+const STATUS_LABEL: Record<Status, string> = {
   NEW: "New",
+  WORKING_LEAD: "Working Lead",
   SERIOUS_BUYER: "Serious Buyer",
+};
+
+const STATUS_BADGE: Record<Status, string> = {
+  NEW: "bg-emerald/10 text-emerald",
+  WORKING_LEAD: "bg-charcoal/10 text-charcoal/70",
+  SERIOUS_BUYER: "bg-gold/20 text-gold-dark",
 };
 
 export default function InquiriesList({ inquiries }: { inquiries: Inquiry[] }) {
@@ -24,7 +33,7 @@ export default function InquiriesList({ inquiries }: { inquiries: Inquiry[] }) {
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const setStatus = async (id: string, status: Inquiry["status"]) => {
+  const setStatus = async (id: string, status: Status) => {
     setBusyId(id);
     try {
       await fetch(`/api/admin/inquiries/${id}`, {
@@ -83,11 +92,7 @@ export default function InquiriesList({ inquiries }: { inquiries: Inquiry[] }) {
             </div>
             <div className="flex items-center gap-2">
               <span
-                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  iq.status === "SERIOUS_BUYER"
-                    ? "bg-gold/20 text-gold-dark"
-                    : "bg-emerald/10 text-emerald"
-                }`}
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE[iq.status]}`}
               >
                 {STATUS_LABEL[iq.status]}
               </span>
@@ -100,23 +105,26 @@ export default function InquiriesList({ inquiries }: { inquiries: Inquiry[] }) {
           <p className="mt-3 whitespace-pre-wrap text-sm text-charcoal/80">{iq.message}</p>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {iq.status === "NEW" ? (
+            {/* New → Working Lead or Serious Buyer; then free between those two.
+                Never back to New. */}
+            {iq.status !== "WORKING_LEAD" && (
+              <button
+                type="button"
+                onClick={() => setStatus(iq.id, "WORKING_LEAD")}
+                disabled={busyId === iq.id}
+                className="rounded-full border border-charcoal/30 px-3 py-1 text-sm text-charcoal/70 hover:bg-charcoal/5 disabled:opacity-50"
+              >
+                Move to Working Lead
+              </button>
+            )}
+            {iq.status !== "SERIOUS_BUYER" && (
               <button
                 type="button"
                 onClick={() => setStatus(iq.id, "SERIOUS_BUYER")}
                 disabled={busyId === iq.id}
                 className="rounded-full border border-gold px-3 py-1 text-sm text-gold-dark hover:bg-gold/10 disabled:opacity-50"
               >
-                Mark as Serious Buyer
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setStatus(iq.id, "NEW")}
-                disabled={busyId === iq.id}
-                className="rounded-full border border-emerald/40 px-3 py-1 text-sm text-emerald hover:bg-emerald/10 disabled:opacity-50"
-              >
-                Move back to New
+                Move to Serious Buyer
               </button>
             )}
 
