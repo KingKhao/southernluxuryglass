@@ -1,33 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUsername } from "@/lib/session";
+import type { InquiryStatus } from "@prisma/client";
 
-const DEFAULT_PIN = "7777";
+const STATUSES: InquiryStatus[] = ["NEW", "SERIOUS_BUYER"];
 
-async function getDeletePin(): Promise<string> {
-  const row = await prisma.setting.findUnique({ where: { key: "deletePin" } });
-  const value = row?.value as { pin?: string } | null;
-  return value?.pin ? String(value.pin) : DEFAULT_PIN;
-}
-
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   if (!(await getSessionUsername())) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
-
-  let pin = "";
+  let status = "";
   try {
     const body = await req.json();
-    pin = String(body.pin ?? "");
+    status = String(body.status ?? "");
   } catch {
     // no body
   }
-
-  const expected = await getDeletePin();
-  if (pin !== expected) {
-    return NextResponse.json({ error: "Incorrect PIN." }, { status: 403 });
+  if (!STATUSES.includes(status as InquiryStatus)) {
+    return NextResponse.json({ error: "Invalid status." }, { status: 400 });
   }
+  await prisma.inquiry.update({
+    where: { id: params.id },
+    data: { status: status as InquiryStatus },
+  });
+  return NextResponse.json({ ok: true });
+}
 
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  if (!(await getSessionUsername())) {
+    return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
+  }
   await prisma.inquiry.delete({ where: { id: params.id } });
   return NextResponse.json({ ok: true });
 }

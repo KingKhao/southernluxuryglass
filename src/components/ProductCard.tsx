@@ -17,8 +17,10 @@ const PLACEHOLDER =
 
 export default function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const cover = product.images[0] ?? PLACEHOLDER;
   const extraCount = Math.max(0, product.images.length - 1);
+  const isLong = product.description.length > 140;
 
   return (
     <>
@@ -44,7 +46,24 @@ export default function ProductCard({ product }: { product: Product }) {
           <span className="w-fit rounded-full bg-emerald/10 px-3 py-1 text-xs uppercase tracking-wider text-emerald">
             {product.category}
           </span>
-          <p className="line-clamp-3 text-sm text-charcoal/70">{product.description}</p>
+          <div>
+            <p
+              className={`text-sm text-charcoal/70 ${
+                isLong && !expanded ? "line-clamp-3" : ""
+              }`}
+            >
+              {product.description}
+            </p>
+            {isLong && (
+              <button
+                type="button"
+                onClick={() => setExpanded((v) => !v)}
+                className="mt-1 text-sm font-medium text-emerald hover:underline"
+              >
+                {expanded ? "Show less" : "Show more"}
+              </button>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => setOpen(true)}

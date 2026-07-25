@@ -52,16 +52,22 @@ model Setting {
   updatedAt DateTime @updatedAt
 }
 
+enum InquiryStatus {
+  NEW
+  SERIOUS_BUYER
+}
+
 // Customer inquiries submitted from the "Inquire About This Piece" form.
 model Inquiry {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   productId   String?
   productName String
   name        String
   phone       String
   email       String
   message     String
-  createdAt   DateTime @default(now())
+  status      InquiryStatus @default(NEW)
+  createdAt   DateTime      @default(now())
 
   @@index([email])
   @@index([phone])

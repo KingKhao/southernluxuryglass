@@ -10,42 +10,51 @@ type Inquiry = {
   phone: string;
   email: string;
   message: string;
+  status: "NEW" | "SERIOUS_BUYER";
   createdAt: string;
+};
+
+const STATUS_LABEL: Record<Inquiry["status"], string> = {
+  NEW: "New",
+  SERIOUS_BUYER: "Serious Buyer",
 };
 
 export default function InquiriesList({ inquiries }: { inquiries: Inquiry[] }) {
   const router = useRouter();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [pin, setPin] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
-  const confirmDelete = async (id: string) => {
-    setBusy(true);
-    setError(null);
+  const setStatus = async (id: string, status: Inquiry["status"]) => {
+    setBusyId(id);
     try {
-      const res = await fetch(`/api/admin/inquiries/${id}`, {
-        method: "DELETE",
+      await fetch(`/api/admin/inquiries/${id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin }),
+        body: JSON.stringify({ status }),
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error || "Failed to delete.");
-        return;
-      }
-      setDeletingId(null);
-      setPin("");
       router.refresh();
     } finally {
-      setBusy(false);
+      setBusyId(null);
+    }
+  };
+
+  const remove = async (id: string) => {
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/admin/inquiries/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setConfirmingId(null);
+        router.refresh();
+      }
+    } finally {
+      setBusyId(null);
     }
   };
 
   if (inquiries.length === 0) {
     return (
       <p className="rounded-lg border border-emerald/15 bg-white/60 px-4 py-6 text-center text-charcoal/60">
-        No inquiries yet.
+        No inquiries here yet.
       </p>
     );
   }
@@ -72,51 +81,70 @@ export default function InquiriesList({ inquiries }: { inquiries: Inquiry[] }) {
                 </a>
               </p>
             </div>
-            <span className="text-xs text-charcoal/40">
-              {new Date(iq.createdAt).toLocaleString()}
-            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                  iq.status === "SERIOUS_BUYER"
+                    ? "bg-gold/20 text-gold-dark"
+                    : "bg-emerald/10 text-emerald"
+                }`}
+              >
+                {STATUS_LABEL[iq.status]}
+              </span>
+              <span className="text-xs text-charcoal/40">
+                {new Date(iq.createdAt).toLocaleString()}
+              </span>
+            </div>
           </div>
+
           <p className="mt-3 whitespace-pre-wrap text-sm text-charcoal/80">{iq.message}</p>
 
-          <div className="mt-3 flex items-center gap-2">
-            {deletingId === iq.id ? (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {iq.status === "NEW" ? (
+              <button
+                type="button"
+                onClick={() => setStatus(iq.id, "SERIOUS_BUYER")}
+                disabled={busyId === iq.id}
+                className="rounded-full border border-gold px-3 py-1 text-sm text-gold-dark hover:bg-gold/10 disabled:opacity-50"
+              >
+                Mark as Serious Buyer
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setStatus(iq.id, "NEW")}
+                disabled={busyId === iq.id}
+                className="rounded-full border border-emerald/40 px-3 py-1 text-sm text-emerald hover:bg-emerald/10 disabled:opacity-50"
+              >
+                Move back to New
+              </button>
+            )}
+
+            <span className="mx-1 text-charcoal/20">|</span>
+
+            {confirmingId === iq.id ? (
               <>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  placeholder="4-digit PIN"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                  className="w-28 rounded-md border border-emerald/30 bg-white px-2 py-1 text-sm"
-                />
+                <span className="text-sm text-charcoal/70">Delete this inquiry?</span>
                 <button
                   type="button"
-                  onClick={() => confirmDelete(iq.id)}
-                  disabled={busy}
+                  onClick={() => remove(iq.id)}
+                  disabled={busyId === iq.id}
                   className="rounded-full bg-red-700 px-3 py-1 text-sm text-white disabled:opacity-50"
                 >
-                  {busy ? "Deleting…" : "Confirm delete"}
+                  {busyId === iq.id ? "Deleting…" : "Yes, delete"}
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setDeletingId(null);
-                    setPin("");
-                    setError(null);
-                  }}
+                  onClick={() => setConfirmingId(null)}
                   className="text-sm text-charcoal/60 hover:underline"
                 >
                   Cancel
                 </button>
-                {error && <span className="text-sm text-red-700">{error}</span>}
               </>
             ) : (
               <button
                 type="button"
-                onClick={() => {
-                  setDeletingId(iq.id);
-                  setError(null);
-                }}
+                onClick={() => setConfirmingId(iq.id)}
                 className="text-sm text-red-700 hover:underline"
               >
                 Delete
