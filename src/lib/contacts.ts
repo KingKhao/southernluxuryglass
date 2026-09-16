@@ -13,53 +13,52 @@ export type ContactSubmission = {
 };
 
 // Single source of truth for adding a contact from any form. Auto-merges by
-// email (case-insensitive, whitespace-trimmed): never creates a duplicate when
-// the email already exists — instead updates the phone if it changed and appends
-// a permanent history entry. Returns the contact id.
+// email (whitespace-trimmed, always stored lowercase): never creates a
+// duplicate when the email already exists — instead updates the phone if it
+// changed and appends a permanent history entry. Returns the contact id.
+//
+// The create-vs-update decision is done as a single upsert keyed on the
+// unique `email` column, so it's atomic at the database level — two
+// concurrent submissions for the same address can't both slip past a
+// check-then-act read and both end up creating a row (they used to, since
+// this was previously a findFirst followed by a separate create/update).
 export async function recordContactSubmission(input: ContactSubmission): Promise<string> {
   const email = input.email.trim().toLowerCase();
   const name = input.name.trim();
   const phone = input.phone.trim();
 
-  const existing = await prisma.contact.findFirst({
-    where: { email: { equals: email, mode: "insensitive" } },
-  });
-
-  if (existing) {
-    const data: { phone?: string; category?: ContactCategory } = {};
-    if (phone && phone !== existing.phone) data.phone = phone;
-    if (input.upgradeNewToFollower && existing.category === "NEW") {
-      data.category = "FOLLOWER";
-    }
-    if (Object.keys(data).length > 0) {
-      await prisma.contact.update({ where: { id: existing.id }, data });
-    }
-    await prisma.contactHistory.create({
-      data: {
-        contactId: existing.id,
-        source: input.source,
-        summary: input.summary,
-        detail: input.detail ?? null,
-      },
-    });
-    return existing.id;
-  }
-
-  const created = await prisma.contact.create({
-    data: {
+  const contact = await prisma.contact.upsert({
+    where: { email },
+    create: {
       name: name || "(no name)",
       email,
       phone,
       productOfInterest: input.summary,
       category: input.categoryOnCreate ?? "NEW",
-      history: {
-        create: {
-          source: input.source,
-          summary: input.summary,
-          detail: input.detail ?? null,
-        },
-      },
+    },
+    update: phone ? { phone } : {},
+  });
+
+  // A NEW contact gets promoted to FOLLOWER on repeat contact, but must
+  // never downgrade an existing BUYER/B2B/FOLLOWER back to FOLLOWER — so
+  // this is its own conditional update (`WHERE category = 'NEW'`), which
+  // Postgres executes atomically. If two of these race for the same
+  // contact, only the first has any effect; the second's WHERE matches
+  // zero rows once the first has already flipped the category.
+  if (input.upgradeNewToFollower) {
+    await prisma.contact.updateMany({
+      where: { id: contact.id, category: "NEW" },
+      data: { category: "FOLLOWER" },
+    });
+  }
+
+  await prisma.contactHistory.create({
+    data: {
+      contactId: contact.id,
+      source: input.source,
+      summary: input.summary,
+      detail: input.detail ?? null,
     },
   });
-  return created.id;
+  return contact.id;
 }

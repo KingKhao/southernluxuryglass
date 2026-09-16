@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { recordContactSubmission } from "@/lib/contacts";
+import { prisma } from "@/lib/prisma";
+
+const MAX_PER_WINDOW = 10;
+const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
 // Early-access email capture. No account is created — this only adds the person
 // to Contacts (as a Follower) via the shared auto-merge logic.
@@ -23,6 +27,24 @@ export async function POST(req: NextRequest) {
   }
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+  }
+
+  // Spam guard: the same email OR phone may submit at most 10 times per 10
+  // minutes — same policy as /api/inquiries, applied here too since both
+  // write into the same Contacts table via recordContactSubmission.
+  const since = new Date(Date.now() - WINDOW_MS);
+  const recent = await prisma.contactHistory.count({
+    where: {
+      source: "signup",
+      createdAt: { gte: since },
+      contact: { OR: [{ email }, { phone }] },
+    },
+  });
+  if (recent >= MAX_PER_WINDOW) {
+    return NextResponse.json(
+      { error: "You've signed up several times recently — please wait a few minutes before trying again." },
+      { status: 429 }
+    );
   }
 
   await recordContactSubmission({

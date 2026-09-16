@@ -3,8 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUsername } from "@/lib/session";
 
 function csvCell(value: string): string {
+  // Neutralize formula injection (CWE-1236): a cell whose content — even
+  // quoted — starts with =, +, -, or @ is still executed as a formula by
+  // Excel/Sheets. These values come from public, unauthenticated form
+  // submissions, so this isn't optional. Prefixing with a plain quote
+  // forces it to be read as literal text instead.
+  const safe = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
   // Always quote; escape embedded quotes by doubling them.
-  return `"${value.replace(/"/g, '""')}"`;
+  return `"${safe.replace(/"/g, '""')}"`;
 }
 
 export async function GET() {

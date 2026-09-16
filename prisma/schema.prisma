@@ -88,14 +88,13 @@ model Contact {
   id                String           @id @default(cuid())
   name              String
   phone             String
-  email             String
+  email             String           @unique
   productOfInterest String?
   category          ContactCategory  @default(NEW)
   notes             ContactNote[]
   history           ContactHistory[]
   createdAt         DateTime         @default(now())
 
-  @@index([email])
   @@index([createdAt])
 }
 
