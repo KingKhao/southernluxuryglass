@@ -44,6 +44,17 @@ model Admin {
   passwordHash String
 }
 
+// Records a failed admin login attempt, keyed by a salted hash of the
+// requester's IP (never the raw IP) so /api/admin/login can rate-limit
+// brute-force attempts. Rows are pruned once they age out of the window.
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  ipHash    String
+  createdAt DateTime @default(now())
+
+  @@index([ipHash, createdAt])
+}
+
 // Generic key/value store for admin-editable site content:
 // homepage hero, mission, About Crystal section, and social links.
 model Setting {
