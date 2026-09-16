@@ -32,3 +32,7 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# local staging area for product photos not yet uploaded through the admin panel
+/photo-drop
+/public/products
