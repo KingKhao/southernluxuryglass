@@ -22,7 +22,7 @@ export default async function GalleryPage() {
         <h1 className="font-serif text-3xl text-emerald sm:text-4xl">
           The Gallery
         </h1>
-        <p className="mx-auto mt-3 max-w-xl text-charcoal/70">
+        <p className="mx-auto mt-3 max-w-xl text-charcoal-muted">
           Every piece currently available, from delicate cordial glasses to
           statement vases. Fall in love, then reach out — nothing here can be
           purchased online yet, just inquired about.

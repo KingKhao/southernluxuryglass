@@ -41,7 +41,7 @@ export default function SignupForm({
   };
 
   const field =
-    "w-full rounded-md border border-emerald/30 bg-white px-3 py-2 text-charcoal placeholder:text-charcoal/40 focus:border-emerald focus:outline-none";
+    "w-full rounded-md border border-emerald/30 bg-white px-3 py-2 text-charcoal placeholder:text-charcoal-muted focus:border-emerald focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald";
 
   if (done) {
     return (

@@ -24,7 +24,7 @@ export default function EventSchedule({ events }: { events: EventItem[] }) {
         <p className="mb-4 text-center font-serif text-lg text-emerald">
           {MONTH_NAMES[today.getMonth()]} {today.getFullYear()}
         </p>
-        <div className="grid grid-cols-7 gap-1 text-center text-xs text-charcoal/50">
+        <div className="grid grid-cols-7 gap-1 text-center text-xs text-charcoal-muted">
           {WEEKDAYS.map((d, i) => (
             <div key={`${d}-${i}`} className="py-1">{d}</div>
           ))}
@@ -37,7 +37,7 @@ export default function EventSchedule({ events }: { events: EventItem[] }) {
                 key={i}
                 className={[
                   "flex h-9 items-center justify-center rounded-full text-sm",
-                  day.inCurrentMonth ? "text-charcoal" : "text-charcoal/25",
+                  day.inCurrentMonth ? "text-charcoal" : "text-charcoal/35",
                   isToday ? "bg-emerald text-cream" : "",
                   day.hasEvent && !isToday ? "bg-gold/20 font-semibold text-emerald" : "",
                 ].join(" ")}
@@ -47,14 +47,14 @@ export default function EventSchedule({ events }: { events: EventItem[] }) {
             );
           })}
         </div>
-        <p className="mt-3 text-center text-xs text-charcoal/50">
+        <p className="mt-3 text-center text-xs text-charcoal-muted">
           Highlighted days have a scheduled live show.
         </p>
       </div>
 
       <ul className="space-y-4">
         {events.length === 0 && (
-          <li className="text-charcoal/60">No upcoming live shows scheduled right now — check back soon!</li>
+          <li className="text-charcoal-muted">No upcoming live shows scheduled right now — check back soon!</li>
         )}
         {events.map((event) => (
           <li
@@ -63,7 +63,7 @@ export default function EventSchedule({ events }: { events: EventItem[] }) {
           >
             <div>
               <p className="font-serif text-lg text-emerald">{event.title}</p>
-              <p className="text-sm text-charcoal/60">
+              <p className="text-sm text-charcoal-muted">
                 {event.date.toLocaleDateString(undefined, {
                   weekday: "long",
                   month: "long",

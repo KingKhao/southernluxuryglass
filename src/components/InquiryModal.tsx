@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useModalA11y } from "@/hooks/useModalA11y";
 
 const MAX_MESSAGE = 2000;
 
@@ -27,6 +28,9 @@ export default function InquiryModal({
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
+  const close = useCallback(() => onClose(), [onClose]);
+  const containerRef = useModalA11y(true, close);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -51,7 +55,7 @@ export default function InquiryModal({
   };
 
   const field =
-    "mt-1 w-full rounded-md border border-emerald/30 bg-white px-3 py-2 text-charcoal focus:border-emerald focus:outline-none";
+    "mt-1 w-full rounded-md border border-emerald/30 bg-white px-3 py-2 text-charcoal focus:border-emerald focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald";
 
   return (
     <div
@@ -59,23 +63,25 @@ export default function InquiryModal({
       onClick={onClose}
       role="dialog"
       aria-modal="true"
+      aria-labelledby="iq-title"
     >
       <div
+        ref={containerRef}
         className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-cream p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-start justify-between">
           <div>
-            <h2 className="font-serif text-xl text-emerald">
+            <h2 id="iq-title" className="font-serif text-xl text-emerald">
               {general ? "Contact Crystal" : "Inquire About This Piece"}
             </h2>
-            {!general && <p className="text-sm text-charcoal/60">{productName}</p>}
+            {!general && <p className="text-sm text-charcoal-muted">{productName}</p>}
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-2xl leading-none text-charcoal/50 hover:text-charcoal"
+            className="text-2xl leading-none text-charcoal-muted hover:text-charcoal"
           >
             ×
           </button>
@@ -84,7 +90,7 @@ export default function InquiryModal({
         {done ? (
           <div className="py-6 text-center">
             <p className="font-serif text-lg text-emerald">Thank you!</p>
-            <p className="mt-2 text-sm text-charcoal/70">
+            <p className="mt-2 text-sm text-charcoal-muted">
               Your inquiry has been sent to Crystal. She&apos;ll be in touch soon.
             </p>
             <button
@@ -98,14 +104,14 @@ export default function InquiryModal({
         ) : (
           <form onSubmit={submit} className="space-y-3">
             <div>
-              <label className="block text-sm text-charcoal/70" htmlFor="iq-name">
+              <label className="block text-sm text-charcoal-muted" htmlFor="iq-name">
                 Name
               </label>
               <input id="iq-name" required value={name} onChange={(e) => setName(e.target.value)} className={field} />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="block text-sm text-charcoal/70" htmlFor="iq-phone">
+                <label className="block text-sm text-charcoal-muted" htmlFor="iq-phone">
                   Phone
                 </label>
                 <input
@@ -118,7 +124,7 @@ export default function InquiryModal({
                 />
               </div>
               <div>
-                <label className="block text-sm text-charcoal/70" htmlFor="iq-email">
+                <label className="block text-sm text-charcoal-muted" htmlFor="iq-email">
                   Email
                 </label>
                 <input
@@ -132,7 +138,7 @@ export default function InquiryModal({
               </div>
             </div>
             <div>
-              <label className="block text-sm text-charcoal/70" htmlFor="iq-message">
+              <label className="block text-sm text-charcoal-muted" htmlFor="iq-message">
                 Message
               </label>
               <textarea
@@ -144,7 +150,7 @@ export default function InquiryModal({
                 onChange={(e) => setMessage(e.target.value.slice(0, MAX_MESSAGE))}
                 className={field}
               />
-              <p className="mt-1 text-right text-xs text-charcoal/40">
+              <p className="mt-1 text-right text-xs text-charcoal-muted">
                 {message.length}/{MAX_MESSAGE}
               </p>
             </div>

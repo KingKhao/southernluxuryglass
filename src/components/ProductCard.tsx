@@ -31,6 +31,8 @@ export default function ProductCard({ product }: { product: Product }) {
           <img
             src={cover}
             alt={product.name}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
           />
           {extraCount > 0 && (
@@ -42,13 +44,13 @@ export default function ProductCard({ product }: { product: Product }) {
 
         <div className="flex flex-1 flex-col gap-2 p-5">
           <h3 className="font-serif text-lg leading-snug text-emerald">{product.name}</h3>
-          <p className="text-lg font-semibold text-gold">${product.price.toFixed(2)}</p>
+          <p className="text-lg font-semibold text-gold-deep">${product.price.toFixed(2)}</p>
           <span className="w-fit rounded-full bg-emerald/10 px-3 py-1 text-xs uppercase tracking-wider text-emerald">
             {product.category}
           </span>
           <div>
             <p
-              className={`text-sm text-charcoal/70 ${
+              className={`text-sm text-charcoal-muted ${
                 isLong && !expanded ? "line-clamp-3" : ""
               }`}
             >

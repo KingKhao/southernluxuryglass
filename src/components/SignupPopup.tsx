@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import SignupForm from "@/components/SignupForm";
+import { useModalA11y } from "@/hooks/useModalA11y";
 
 const STORAGE_KEY = "slg_signup_dismissed";
 
@@ -52,14 +53,7 @@ export default function SignupPopup() {
     setOpen(false);
   };
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") dismiss();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  const containerRef = useModalA11y(open, dismiss);
 
   if (!open) return null;
 
@@ -69,8 +63,10 @@ export default function SignupPopup() {
       onClick={dismiss}
       role="dialog"
       aria-modal="true"
+      aria-labelledby="signup-popup-title"
     >
       <div
+        ref={containerRef}
         className="relative w-full max-w-md rounded-lg bg-cream p-6 text-center shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
@@ -78,14 +74,14 @@ export default function SignupPopup() {
           type="button"
           onClick={dismiss}
           aria-label="Close"
-          className="absolute right-3 top-2 text-2xl leading-none text-charcoal/50 hover:text-charcoal"
+          className="absolute right-3 top-2 text-2xl leading-none text-charcoal-muted hover:text-charcoal"
         >
           ×
         </button>
-        <h2 className="font-serif text-2xl text-emerald">
+        <h2 id="signup-popup-title" className="font-serif text-2xl text-emerald">
           Be the first to see new pieces
         </h2>
-        <p className="mx-auto mt-2 max-w-sm text-sm text-charcoal/70">
+        <p className="mx-auto mt-2 max-w-sm text-sm text-charcoal-muted">
           Sign up for early access to new inventory before it hits the site.
         </p>
         <div className="mt-5">

@@ -30,13 +30,13 @@ export default async function HomePage() {
   return (
     <div>
       <section className="bg-ivory px-6 py-20 text-center">
-        <p className="font-serif text-sm uppercase tracking-[0.3em] text-gold">
+        <p className="font-serif text-sm uppercase tracking-[0.3em] text-gold-deep">
           {home.heroEyebrow}
         </p>
         <h1 className="mx-auto mt-4 max-w-2xl font-serif text-4xl leading-tight text-emerald sm:text-5xl">
           {home.heroTitle}
         </h1>
-        <p className="mx-auto mt-5 max-w-xl text-charcoal/70">{home.heroSubtitle}</p>
+        <p className="mx-auto mt-5 max-w-xl text-charcoal-muted">{home.heroSubtitle}</p>
         <Link
           href="/gallery"
           className="mt-8 inline-block rounded-full bg-emerald px-8 py-3 text-cream transition-colors hover:bg-emerald-dark"
@@ -66,7 +66,7 @@ export default async function HomePage() {
             ))}
           </div>
         ) : (
-          <p className="text-center text-charcoal/60">
+          <p className="text-center text-charcoal-muted">
             Featured pieces are coming soon — check the full gallery in the
             meantime.
           </p>
@@ -83,7 +83,7 @@ export default async function HomePage() {
       <section className="bg-ivory px-6 py-16">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="font-serif text-2xl text-emerald">Our Mission</h2>
-          <p className="mt-4 font-serif text-xl italic text-charcoal/80">
+          <p className="mt-4 font-serif text-xl italic text-charcoal-muted">
             &ldquo;{home.missionStatement}&rdquo;
           </p>
         </div>
@@ -98,12 +98,14 @@ export default async function HomePage() {
               alt={home.aboutHeading}
               width={360}
               height={480}
+              loading="lazy"
+              decoding="async"
               className="rounded-lg object-cover shadow-md"
             />
           </div>
           <div className="text-center sm:order-1 sm:text-left">
             <h2 className="font-serif text-2xl text-emerald">{home.aboutHeading}</h2>
-            <p className="mt-4 text-charcoal/70">{home.aboutText}</p>
+            <p className="mt-4 text-charcoal-muted">{home.aboutText}</p>
             <Link
               href="/about"
               className="mt-4 inline-block text-emerald underline decoration-gold decoration-2 underline-offset-4 hover:text-emerald-dark"

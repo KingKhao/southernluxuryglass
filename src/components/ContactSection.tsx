@@ -15,7 +15,7 @@ export default function ContactSection({
   return (
     <section className="mt-16 border-t border-emerald/10 bg-ivory px-6 py-14 text-center">
       <h2 className="font-serif text-2xl text-emerald">{heading}</h2>
-      <p className="mx-auto mt-3 max-w-xl text-charcoal/70">{blurb}</p>
+      <p className="mx-auto mt-3 max-w-xl text-charcoal-muted">{blurb}</p>
       <button
         type="button"
         onClick={() => setOpen(true)}

@@ -48,9 +48,11 @@ export default function GalleryGrid({
           {["All", ...categories].map((category) => (
             <button
               key={category}
+              type="button"
               onClick={() => setActiveCategory(category)}
+              aria-pressed={activeCategory === category}
               className={[
-                "rounded-full border px-4 py-1.5 text-sm transition-colors",
+                "min-h-[44px] rounded-full border px-4 py-2 text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald",
                 activeCategory === category
                   ? "border-emerald bg-emerald text-cream"
                   : "border-emerald/30 text-emerald hover:bg-emerald/10",
@@ -61,12 +63,16 @@ export default function GalleryGrid({
           ))}
         </div>
 
+        <label htmlFor="gallery-search" className="sr-only">
+          Search pieces
+        </label>
         <input
+          id="gallery-search"
           type="search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search pieces..."
-          className="w-full rounded-full border border-emerald/30 bg-white/70 px-4 py-1.5 text-sm text-charcoal placeholder:text-charcoal/40 focus:border-emerald focus:outline-none sm:w-64"
+          className="w-full rounded-full border border-emerald/30 bg-white/70 px-4 py-2 text-sm text-charcoal placeholder:text-charcoal-muted focus:border-emerald focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald sm:w-64"
         />
       </div>
 
@@ -77,7 +83,7 @@ export default function GalleryGrid({
           ))}
         </div>
       ) : (
-        <p className="py-12 text-center text-charcoal/60">
+        <p className="py-12 text-center text-charcoal-muted">
           No pieces match your search just yet — try a different category or
           search term.
         </p>

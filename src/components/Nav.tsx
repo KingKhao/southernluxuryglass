@@ -19,7 +19,7 @@ export default function Nav() {
             <Link
               key={link.href}
               href={link.href}
-              className="transition-colors hover:text-gold"
+              className="transition-colors hover:text-gold-deep"
             >
               {link.label}
             </Link>

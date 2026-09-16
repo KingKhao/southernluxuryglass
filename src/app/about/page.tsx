@@ -14,7 +14,7 @@ export default async function AboutPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
-      <p className="text-center font-serif italic text-gold">About the Curator</p>
+      <p className="text-center font-serif italic text-gold-deep">About the Curator</p>
       <h1 className="mt-2 text-center font-serif text-3xl text-emerald sm:text-4xl">
         {CURATOR_NAME}
       </h1>
@@ -30,13 +30,13 @@ export default async function AboutPage() {
         />
       </div>
 
-      <div className="mt-10 space-y-6 text-charcoal/80">
+      <div className="mt-10 space-y-6 text-charcoal-muted">
         {paragraphs.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
 
         <h2 className="font-serif text-2xl text-emerald">My Mission</h2>
-        <p className="font-serif text-xl italic text-charcoal/80">
+        <p className="font-serif text-xl italic text-charcoal-muted">
           &ldquo;{about.mission}&rdquo;
         </p>
 

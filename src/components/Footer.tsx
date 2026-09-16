@@ -30,7 +30,7 @@ export default async function Footer() {
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-wider text-cream/50">
+            <p className="text-xs uppercase tracking-wider text-cream/80">
               Follow &amp; Watch Live
             </p>
             <ul className="mt-3 space-y-2 text-sm">
@@ -54,13 +54,13 @@ export default async function Footer() {
                 </li>
               )}
               {!hasAny && (
-                <li className="text-xs italic text-cream/40">Links coming soon</li>
+                <li className="text-xs italic text-cream/70">Links coming soon</li>
               )}
             </ul>
           </div>
         </div>
 
-        <p className="mt-10 text-xs text-cream/40">
+        <p className="mt-10 text-xs text-cream/70">
           &copy; {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
         </p>
       </div>
