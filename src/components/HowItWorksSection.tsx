@@ -9,7 +9,7 @@ const STEPS = [
   },
   {
     title: "Arrange Your Purchase",
-    body: "Once you're ready, she'll walk you through payment and getting your piece to you.",
+    body: "Once you're ready, she'll walk you through the invoice process and getting your piece to you.",
   },
 ];
 
