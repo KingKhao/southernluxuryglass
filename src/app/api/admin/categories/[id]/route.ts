@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getSessionUsername } from "@/lib/session";
 
@@ -24,6 +25,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (body.sortOrder != null) data.sortOrder = Number(body.sortOrder);
 
   const category = await prisma.category.update({ where: { id }, data });
+  revalidatePath("/gallery");
   return NextResponse.json(category);
 }
 
@@ -42,5 +44,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
   }
 
   await prisma.category.delete({ where: { id } });
+  revalidatePath("/gallery");
   return NextResponse.json({ ok: true });
 }

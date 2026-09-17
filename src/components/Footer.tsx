@@ -43,6 +43,7 @@ export default async function Footer() {
                     className="hover:text-gold-light"
                   >
                     {platform.label}
+                    <span className="sr-only"> (opens in new tab)</span>
                   </Link>
                 </li>
               ))}

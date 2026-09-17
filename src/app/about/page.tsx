@@ -2,7 +2,9 @@ import { CURATOR_NAME } from "@/lib/site";
 import { getSettings } from "@/lib/settings";
 import ContactSection from "@/components/ContactSection";
 
-export const dynamic = "force-dynamic";
+// Cached and background-revalidated; /api/admin/settings already calls
+// revalidatePath("/about") for an immediate refresh after an edit.
+export const revalidate = 60;
 
 export const metadata = {
   title: "About Crystal | Southern Luxury Glass",

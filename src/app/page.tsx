@@ -7,7 +7,11 @@ import SignupSection from "@/components/SignupSection";
 import SignupPopup from "@/components/SignupPopup";
 import { getSettings } from "@/lib/settings";
 
-export const dynamic = "force-dynamic";
+// Cached and background-revalidated instead of rebuilt from the DB on every
+// request; admin edits (products/events/settings) already call
+// revalidatePath("/") for an immediate refresh, so this is a safe fallback
+// cache window, not a staleness risk.
+export const revalidate = 60;
 
 export default async function HomePage() {
   const [featuredProducts, upcomingEvents, settings] = await Promise.all([
@@ -120,7 +124,7 @@ export default async function HomePage() {
 
       <SignupSection />
 
-      <SignupPopup />
+      <SignupPopup hasLiveShows={upcomingEvents.length > 0} />
     </div>
   );
 }

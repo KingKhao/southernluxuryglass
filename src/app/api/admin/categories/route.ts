@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getSessionUsername } from "@/lib/session";
 
@@ -32,5 +33,6 @@ export async function POST(req: NextRequest) {
   const sortOrder = (max._max.sortOrder ?? -1) + 1;
 
   const category = await prisma.category.create({ data: { name, sortOrder } });
+  revalidatePath("/gallery");
   return NextResponse.json(category, { status: 201 });
 }

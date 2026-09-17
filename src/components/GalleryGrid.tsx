@@ -31,15 +31,19 @@ export default function GalleryGrid({
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [search, setSearch] = useState("");
 
-  const filtered = products.filter((product) => {
-    const matchesCategory =
-      activeCategory === "All" || product.category === activeCategory;
-    const matchesSearch =
-      search.trim() === "" ||
-      product.name.toLowerCase().includes(search.toLowerCase()) ||
-      product.description.toLowerCase().includes(search.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filtered = useMemo(
+    () =>
+      products.filter((product) => {
+        const matchesCategory =
+          activeCategory === "All" || product.category === activeCategory;
+        const matchesSearch =
+          search.trim() === "" ||
+          product.name.toLowerCase().includes(search.toLowerCase()) ||
+          product.description.toLowerCase().includes(search.toLowerCase());
+        return matchesCategory && matchesSearch;
+      }),
+    [products, activeCategory, search]
+  );
 
   return (
     <div>
@@ -55,7 +59,7 @@ export default function GalleryGrid({
                 "min-h-[44px] rounded-full border px-4 py-2 text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald",
                 activeCategory === category
                   ? "border-emerald bg-emerald text-cream"
-                  : "border-emerald/30 text-emerald hover:bg-emerald/10",
+                  : "border-emerald/60 text-emerald hover:bg-emerald/10",
               ].join(" ")}
             >
               {category}
@@ -72,7 +76,7 @@ export default function GalleryGrid({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search pieces..."
-          className="w-full rounded-full border border-emerald/30 bg-white/70 px-4 py-2 text-sm text-charcoal placeholder:text-charcoal-muted focus:border-emerald focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald sm:w-64"
+          className="w-full rounded-full border border-emerald/60 bg-white/70 px-4 py-2 text-sm text-charcoal placeholder:text-charcoal-muted focus:border-emerald focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald sm:w-64"
         />
       </div>
 

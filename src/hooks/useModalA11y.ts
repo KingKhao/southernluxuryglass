@@ -23,7 +23,14 @@ export function useModalA11y(open: boolean, onClose: () => void) {
     const focusables = container
       ? Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE))
       : [];
-    focusables[0]?.focus();
+    // The close button is usually first in DOM order (top-right of the
+    // dialog) — autofocusing it means a reflexive Enter/Space dismisses the
+    // dialog instead of engaging the first real field. Prefer the first
+    // focusable element that isn't the close button; fall back to it only
+    // if nothing else is focusable.
+    const initialFocus =
+      focusables.find((el) => !el.hasAttribute("data-modal-close")) ?? focusables[0];
+    initialFocus?.focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {

@@ -6,7 +6,7 @@ import { useModalA11y } from "@/hooks/useModalA11y";
 
 const STORAGE_KEY = "slg_signup_dismissed";
 
-export default function SignupPopup() {
+export default function SignupPopup({ hasLiveShows = true }: { hasLiveShows?: boolean }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -25,9 +25,11 @@ export default function SignupPopup() {
     // Trigger 1: 15 seconds after load.
     const timer = window.setTimeout(show, 15000);
 
-    // Trigger 2: scrolling to the Upcoming Live Shows section.
+    // Trigger 2: scrolling to the Upcoming Live Shows section — skipped when
+    // there are no upcoming shows, so the signup ask doesn't land right on
+    // top of an empty "check back soon" state.
     let observer: IntersectionObserver | null = null;
-    const target = document.getElementById("live-shows");
+    const target = hasLiveShows ? document.getElementById("live-shows") : null;
     if (target && "IntersectionObserver" in window) {
       observer = new IntersectionObserver(
         (entries) => {
@@ -43,7 +45,7 @@ export default function SignupPopup() {
       observer?.disconnect();
     }
     return cleanup;
-  }, []);
+  }, [hasLiveShows]);
 
   const persistDismissed = () => {
     if (typeof window !== "undefined") localStorage.setItem(STORAGE_KEY, "1");
@@ -74,7 +76,8 @@ export default function SignupPopup() {
           type="button"
           onClick={dismiss}
           aria-label="Close"
-          className="absolute right-3 top-2 text-2xl leading-none text-charcoal-muted hover:text-charcoal"
+          data-modal-close
+          className="absolute right-1 top-1 flex h-11 w-11 items-center justify-center text-2xl leading-none text-charcoal-muted hover:text-charcoal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald"
         >
           ×
         </button>

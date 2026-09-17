@@ -19,9 +19,12 @@ export async function POST(req: NextRequest) {
   const email = String(body.email ?? "").trim();
   const phone = String(body.phone ?? "").trim();
 
-  if (!name || !email || !phone) {
+  const missing = [!name && "name", !email && "email", !phone && "phone"].filter(
+    (f): f is string => Boolean(f)
+  );
+  if (missing.length > 0) {
     return NextResponse.json(
-      { error: "Please add your name, email, and phone." },
+      { error: `Please add your ${missing.join(", ")}.` },
       { status: 400 }
     );
   }

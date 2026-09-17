@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import InquiryModal from "@/components/InquiryModal";
+import ImageLightbox from "@/components/ImageLightbox";
 
 type Product = {
   id: string;
@@ -12,13 +13,17 @@ type Product = {
   images: string[];
 };
 
-const PLACEHOLDER =
-  "https://placehold.co/800x1000/E9E3D5/2F4A3D?font=playfair-display&text=Photo+Coming+Soon";
+// Whole-dollar prices read cleaner without a trailing ".00" ($119 vs
+// $119.00); real cents still show ($119.50).
+function formatPrice(price: number) {
+  return Number.isInteger(price) ? `$${price}` : `$${price.toFixed(2)}`;
+}
 
 export default function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const cover = product.images[0] ?? PLACEHOLDER;
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const cover = product.images[0];
   const extraCount = Math.max(0, product.images.length - 1);
   const isLong = product.description.length > 140;
 
@@ -27,16 +32,38 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className="flex flex-col overflow-hidden rounded-lg border border-emerald/15 bg-white/70 shadow-sm transition-shadow hover:shadow-md">
         {/* Tall portrait image — the star of the card */}
         <div className="relative aspect-[4/5] w-full overflow-hidden bg-ivory">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={cover}
-            alt={product.name}
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-          />
+          {cover ? (
+            <button
+              type="button"
+              onClick={() => setLightboxOpen(true)}
+              aria-label={
+                extraCount > 0
+                  ? `View all ${extraCount + 1} photos of ${product.name}`
+                  : `View larger photo of ${product.name}`
+              }
+              className="block h-full w-full focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-emerald"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={cover}
+                alt={product.name}
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+              />
+            </button>
+          ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-emerald/40">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-10 w-10">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="9" cy="9" r="2" />
+                <path d="m21 15-5-5L5 21" />
+              </svg>
+              <span className="font-serif text-sm italic">Photo coming soon</span>
+            </div>
+          )}
           {extraCount > 0 && (
-            <span className="absolute bottom-2 right-2 rounded-full bg-charcoal/70 px-2 py-0.5 text-xs text-white">
+            <span className="pointer-events-none absolute bottom-2 right-2 rounded-full bg-charcoal/70 px-2 py-0.5 text-xs text-white">
               +{extraCount} more
             </span>
           )}
@@ -44,7 +71,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
         <div className="flex flex-1 flex-col gap-2 p-5">
           <h3 className="font-serif text-lg leading-snug text-emerald">{product.name}</h3>
-          <p className="text-lg font-semibold text-gold-deep">${product.price.toFixed(2)}</p>
+          <p className="text-lg font-semibold text-gold-deep">{formatPrice(product.price)}</p>
           <span className="w-fit rounded-full bg-emerald/10 px-3 py-1 text-xs uppercase tracking-wider text-emerald">
             {product.category}
           </span>
@@ -81,6 +108,15 @@ export default function ProductCard({ product }: { product: Product }) {
           productName={product.name}
           productId={product.id}
           onClose={() => setOpen(false)}
+        />
+      )}
+
+      {lightboxOpen && (
+        <ImageLightbox
+          images={product.images}
+          initialIndex={0}
+          alt={product.name}
+          onClose={() => setLightboxOpen(false)}
         />
       )}
     </>

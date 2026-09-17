@@ -20,9 +20,15 @@ export async function POST(req: NextRequest) {
   const productName = String(body.productName ?? "").trim() || "General inquiry";
   const productId = body.productId ? String(body.productId) : null;
 
-  if (!name || !phone || !email || !message) {
+  const missing = [
+    !name && "name",
+    !phone && "phone",
+    !email && "email",
+    !message && "message",
+  ].filter((f): f is string => Boolean(f));
+  if (missing.length > 0) {
     return NextResponse.json(
-      { error: "Please fill in your name, phone, email, and a message." },
+      { error: `Please fill in your ${missing.join(", ")}.` },
       { status: 400 }
     );
   }

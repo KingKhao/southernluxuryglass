@@ -55,7 +55,7 @@ export default function InquiryModal({
   };
 
   const field =
-    "mt-1 w-full rounded-md border border-emerald/30 bg-white px-3 py-2 text-charcoal focus:border-emerald focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald";
+    "mt-1 w-full rounded-md border border-emerald/60 bg-white px-3 py-2 text-charcoal focus:border-emerald focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald";
 
   return (
     <div
@@ -81,14 +81,15 @@ export default function InquiryModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-2xl leading-none text-charcoal-muted hover:text-charcoal"
+            data-modal-close
+            className="flex h-11 w-11 shrink-0 items-center justify-center text-2xl leading-none text-charcoal-muted hover:text-charcoal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald"
           >
             ×
           </button>
         </div>
 
         {done ? (
-          <div className="py-6 text-center">
+          <div className="py-6 text-center" role="status">
             <p className="font-serif text-lg text-emerald">Thank you!</p>
             <p className="mt-2 text-sm text-charcoal-muted">
               Your inquiry has been sent to Crystal. She&apos;ll be in touch soon.
@@ -155,7 +156,11 @@ export default function InquiryModal({
               </p>
             </div>
 
-            {error && <p className="text-sm text-red-700">{error}</p>}
+            {error && (
+              <p className="text-sm text-error" role="alert">
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"

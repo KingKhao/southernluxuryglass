@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import GalleryGrid from "@/components/GalleryGrid";
 
-export const dynamic = "force-dynamic";
+// Cached and background-revalidated; product/category admin actions already
+// call revalidatePath("/gallery") for an immediate refresh after an edit.
+export const revalidate = 60;
 
 export const metadata = {
   title: "Gallery | Southern Luxury Glass",

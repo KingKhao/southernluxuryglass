@@ -41,11 +41,11 @@ export default function SignupForm({
   };
 
   const field =
-    "w-full rounded-md border border-emerald/30 bg-white px-3 py-2 text-charcoal placeholder:text-charcoal-muted focus:border-emerald focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald";
+    "w-full rounded-md border border-emerald/60 bg-white px-3 py-2 text-charcoal placeholder:text-charcoal-muted focus:border-emerald focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald";
 
   if (done) {
     return (
-      <p className="font-serif text-lg text-emerald">
+      <p className="font-serif text-lg text-emerald" role="status">
         You&apos;re on the list! You&apos;ll be first to see new pieces. ✨
       </p>
     );
@@ -76,7 +76,11 @@ export default function SignupForm({
         onChange={(e) => setPhone(e.target.value)}
         className={field}
       />
-      {error && <p className="text-sm text-red-700">{error}</p>}
+      {error && (
+        <p className="text-sm text-error" role="alert">
+          {error}
+        </p>
+      )}
       <button
         type="submit"
         disabled={submitting}

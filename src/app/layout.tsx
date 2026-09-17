@@ -16,10 +16,26 @@ const body = Lato({
   weight: ["400", "700"],
 });
 
+const TITLE = "Southern Luxury Glass | Curated by Crystal Brisbois";
+const DESCRIPTION =
+  "Curated antique and vintage glassware from Southern Luxury Glass — vases, dinnerware, glasses, décor, and serveware with history and character.";
+
 export const metadata: Metadata = {
-  title: "Southern Luxury Glass | Curated by Crystal Brisbois",
-  description:
-    "Curated antique and vintage glassware from Southern Luxury Glass — vases, dinnerware, glasses, décor, and serveware with history and character.",
+  metadataBase: new URL("https://southernluxuryglass.vercel.app"),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "website",
+    images: [{ url: "/crystal-bio-card.png", width: 1536, height: 1024, alt: "Crystal Brisbois, curator of Southern Luxury Glass" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/crystal-bio-card.png"],
+  },
 };
 
 export default function RootLayout({

@@ -83,6 +83,7 @@ export default function EventSchedule({ events }: { events: EventItem[] }) {
               className="inline-block whitespace-nowrap rounded-full bg-emerald px-5 py-2 text-sm text-cream transition-colors hover:bg-emerald-dark"
             >
               Watch on {event.platformName}
+              <span className="sr-only"> (opens in new tab)</span>
             </a>
           </li>
         ))}

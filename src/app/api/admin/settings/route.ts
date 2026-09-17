@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSettings, setSetting, type SettingKey } from "@/lib/settings";
 import { getSessionUsername } from "@/lib/session";
 
@@ -23,6 +24,12 @@ export async function PUT(req: NextRequest) {
       await setSetting(key, body[key]);
     }
   }
+
+  // Home/About now use time-based revalidation instead of force-dynamic, so
+  // a settings edit needs an explicit on-demand revalidation to show up
+  // immediately rather than waiting out the cache window.
+  revalidatePath("/");
+  revalidatePath("/about");
 
   const settings = await getSettings();
   return NextResponse.json(settings);
