@@ -75,6 +75,19 @@ export default async function Footer() {
             </Link>
           </nav>
         </div>
+
+        <p className="mt-4 text-center text-xs text-cream/70 sm:text-right">
+          Site by{" "}
+          <a
+            href="https://clinchvalleydigital.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-gold-light"
+          >
+            Clinch Valley Digital
+            <span className="sr-only"> (opens in new tab)</span>
+          </a>
+        </p>
       </div>
     </footer>
   );
