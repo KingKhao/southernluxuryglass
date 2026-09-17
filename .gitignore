@@ -36,3 +36,5 @@ next-env.d.ts
 # local staging area for product photos not yet uploaded through the admin panel
 /photo-drop
 /public/products
+.scratch_cookies*
+export_check*.csv
