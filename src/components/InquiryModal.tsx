@@ -92,7 +92,9 @@ export default function InquiryModal({
           <div className="py-6 text-center" role="status">
             <p className="font-serif text-lg text-emerald">Thank you!</p>
             <p className="mt-2 text-sm text-charcoal-muted">
-              Your inquiry has been sent to Crystal. She&apos;ll be in touch soon.
+              {general
+                ? "Your message has been sent to Crystal. She reads every message herself and can't wait to connect with you."
+                : "Your inquiry has been sent to Crystal. She reads every message herself and would love to share more about this piece with you."}
             </p>
             <button
               type="button"
@@ -119,10 +121,14 @@ export default function InquiryModal({
                   id="iq-phone"
                   type="tel"
                   required
+                  aria-describedby="iq-phone-hint"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className={field}
                 />
+                <p id="iq-phone-hint" className="mt-1 text-xs text-charcoal-muted">
+                  So Crystal can text you a couple of extra photos or details.
+                </p>
               </div>
               <div>
                 <label className="block text-sm text-charcoal-muted" htmlFor="iq-email">

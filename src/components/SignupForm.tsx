@@ -72,10 +72,14 @@ export default function SignupForm({
         required
         type="tel"
         placeholder="Phone number"
+        aria-describedby="signup-phone-hint"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
         className={field}
       />
+      <p id="signup-phone-hint" className="text-xs text-charcoal-muted">
+        So Crystal can text you when something you&apos;d love comes in.
+      </p>
       {error && (
         <p className="text-sm text-error" role="alert">
           {error}

@@ -84,14 +84,14 @@ export default async function HomePage() {
         <EventSchedule events={upcomingEvents} />
       </section>
 
-      <section className="bg-ivory px-6 py-16">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="font-serif text-2xl text-emerald">Our Mission</h2>
-          <p className="mt-4 font-serif text-xl italic text-charcoal-muted">
-            &ldquo;{home.missionStatement}&rdquo;
-          </p>
-        </div>
-      </section>
+      {/* The mission statement lives on the About page (about.mission) as
+          Crystal's own words in her own voice — this section used to repeat
+          the identical sentence here too (home.missionStatement), which read
+          as duplicated content between two pages a visitor might read back
+          to back. Removed rather than reworded, since inventing a different
+          sentence just to avoid the repeat would be adding copy, not fixing
+          it. home.missionStatement is left as-is in Settings in case it's
+          wanted back for something else later. */}
 
       <section className="mx-auto max-w-5xl px-6 py-16">
         <div className="grid items-center gap-10 sm:grid-cols-2">
