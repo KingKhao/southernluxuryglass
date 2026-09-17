@@ -17,6 +17,7 @@ export type HomeContentSetting = {
   heroEyebrow: string;
   heroTitle: string;
   heroSubtitle: string;
+  heroImageUrl: string;
   missionStatement: string;
   aboutHeading: string;
   aboutText: string;
@@ -41,12 +42,13 @@ export const SETTINGS_DEFAULTS: SettingsShape = {
     heroTitle: "Antique & Vintage Glassware, Rediscovered",
     heroSubtitle:
       "One-of-a-kind pieces with history, character, and Southern charm — handpicked and lovingly restored to their rightful shine.",
+    heroImageUrl: "/crystal-home.png",
     missionStatement:
       "Every piece tells a story — my mission is to help you find the pieces that become part of yours.",
     aboutHeading: "About Crystal Brisbois",
     aboutText:
       "My love for beautiful things started long before Southern Luxury Glass became a reality. I believe every piece tells a story — and my mission is to help you find the pieces that become part of yours.",
-    aboutImageUrl: "/crystal-home.png",
+    aboutImageUrl: "/crystal-about.png",
   },
   social: {
     instagram: { url: "", enabled: false },

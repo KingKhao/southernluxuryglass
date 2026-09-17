@@ -38,6 +38,11 @@ export default async function GalleryPage() {
           price: p.price,
           description: p.description,
           images: p.images,
+          status: p.status,
+          dimensions: p.dimensions,
+          era: p.era,
+          condition: p.condition,
+          maker: p.maker,
         }))}
         categoryOrder={categories.map((c) => c.name)}
       />

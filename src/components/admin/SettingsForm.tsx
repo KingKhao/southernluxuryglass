@@ -53,6 +53,20 @@ export default function SettingsForm({
     }
   };
 
+  const uploadHeroImage = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    setStatus(null);
+    try {
+      const url = await uploadImage(file, "hero");
+      setHome("heroImageUrl", url);
+    } catch (err) {
+      setStatus((err as Error).message || "Image upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const save = async () => {
     setSaving(true);
     setStatus(null);
@@ -100,6 +114,29 @@ export default function SettingsForm({
           value={settings.home.heroSubtitle}
           onChange={(e) => setHome("heroSubtitle", e.target.value)}
         />
+        <label className={`${labelClass} mt-3`}>Background photo</label>
+        <p className="mb-1 text-xs text-charcoal/50">
+          A tall, well-lit photo works best — it fills the entire top of the homepage.
+        </p>
+        <div className="mt-1 flex items-center gap-4">
+          {settings.home.heroImageUrl && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={settings.home.heroImageUrl}
+              alt="Homepage hero background"
+              className="h-24 w-20 rounded-md border border-emerald/20 object-cover"
+            />
+          )}
+          <label className="cursor-pointer rounded-full border border-emerald px-4 py-2 text-sm text-emerald hover:bg-emerald hover:text-cream">
+            {uploading ? "Uploading…" : "Upload new photo"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => uploadHeroImage(e.target.files?.[0])}
+            />
+          </label>
+        </div>
       </div>
 
       {/* Mission */}

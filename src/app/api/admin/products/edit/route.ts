@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUsername } from "@/lib/session";
+import type { ProductStatus } from "@prisma/client";
+
+const PRODUCT_STATUSES: ProductStatus[] = ["AVAILABLE", "RESERVED", "SOLD"];
 
 // REST counterpart to products/actions.ts's updateProduct Server Action, for
 // admin tooling that can't drive a Server Action directly (e.g. scripted
@@ -20,6 +23,11 @@ export async function POST(req: NextRequest) {
     categoryName?: unknown;
     description?: unknown;
     images?: unknown;
+    status?: unknown;
+    dimensions?: unknown;
+    era?: unknown;
+    condition?: unknown;
+    maker?: unknown;
   };
   try {
     body = await req.json();
@@ -33,7 +41,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "id or matchName is required to find the product." }, { status: 400 });
   }
 
-  const data: { name?: string; categoryId?: string; description?: string; images?: string[] } = {};
+  const data: {
+    name?: string;
+    categoryId?: string;
+    description?: string;
+    images?: string[];
+    status?: ProductStatus;
+    dimensions?: string | null;
+    era?: string | null;
+    condition?: string | null;
+    maker?: string | null;
+  } = {};
 
   if (typeof body.name === "string" && body.name.trim() !== "") {
     data.name = body.name.trim();
@@ -51,6 +69,18 @@ export async function POST(req: NextRequest) {
   if (Array.isArray(body.images)) {
     const images = body.images.filter((i): i is string => typeof i === "string" && i.trim() !== "");
     if (images.length > 0) data.images = images;
+  }
+  if (typeof body.status === "string" && PRODUCT_STATUSES.includes(body.status as ProductStatus)) {
+    data.status = body.status as ProductStatus;
+  }
+  for (const [key, field] of [
+    ["dimensions", "dimensions"],
+    ["era", "era"],
+    ["condition", "condition"],
+    ["maker", "maker"],
+  ] as const) {
+    const value = body[key];
+    if (typeof value === "string") data[field] = value.trim() || null;
   }
 
   if (Object.keys(data).length === 0) {

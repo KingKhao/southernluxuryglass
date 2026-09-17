@@ -3,6 +3,7 @@
 import { useState } from "react";
 import InquiryModal from "@/components/InquiryModal";
 import ImageLightbox from "@/components/ImageLightbox";
+import { useFavorites } from "@/hooks/useFavorites";
 
 type Product = {
   id: string;
@@ -11,6 +12,11 @@ type Product = {
   price: number;
   description: string;
   images: string[];
+  status?: "AVAILABLE" | "RESERVED" | "SOLD";
+  dimensions?: string | null;
+  era?: string | null;
+  condition?: string | null;
+  maker?: string | null;
 };
 
 // Whole-dollar prices read cleaner without a trailing ".00" ($119 vs
@@ -23,9 +29,19 @@ export default function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
   const cover = product.images[0];
   const extraCount = Math.max(0, product.images.length - 1);
   const isLong = product.description.length > 140;
+  const status = product.status ?? "AVAILABLE";
+  const saved = isFavorite(product.id);
+
+  const details = [
+    product.dimensions && { label: "Dimensions", value: product.dimensions },
+    product.era && { label: "Era", value: product.era },
+    product.condition && { label: "Condition", value: product.condition },
+    product.maker && { label: "Maker", value: product.maker },
+  ].filter((d): d is { label: string; value: string } => Boolean(d));
 
   return (
     <>
@@ -49,7 +65,9 @@ export default function ProductCard({ product }: { product: Product }) {
                 alt={product.name}
                 loading="lazy"
                 decoding="async"
-                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                className={`h-full w-full object-cover transition-transform duration-500 hover:scale-105 ${
+                  status === "SOLD" ? "grayscale" : ""
+                }`}
               />
             </button>
           ) : (
@@ -62,6 +80,37 @@ export default function ProductCard({ product }: { product: Product }) {
               <span className="font-serif text-sm italic">Photo coming soon</span>
             </div>
           )}
+
+          <button
+            type="button"
+            onClick={() => toggleFavorite(product.id)}
+            aria-label={saved ? `Remove ${product.name} from saved pieces` : `Save ${product.name}`}
+            aria-pressed={saved}
+            className="absolute left-2 top-2 flex h-9 w-9 items-center justify-center rounded-full bg-charcoal/50 text-white backdrop-blur-sm transition-colors hover:bg-charcoal/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill={saved ? "currentColor" : "none"}
+              stroke="currentColor"
+              strokeWidth="1.75"
+              className="h-5 w-5"
+            >
+              <path d="M12 21s-7.5-4.6-10-9.1C.5 8.6 2 5 5.5 5c2 0 3.5 1.2 4.5 2.7C11 6.2 12.5 5 14.5 5 18 5 19.5 8.6 22 11.9 14.5 16.4 12 21 12 21Z" />
+            </svg>
+          </button>
+
+          {status !== "AVAILABLE" && (
+            <span
+              className={[
+                "pointer-events-none absolute left-2 bottom-2 rounded-full px-3 py-1 text-xs font-medium uppercase tracking-wider",
+                status === "SOLD" ? "bg-charcoal text-cream" : "bg-gold-deep text-cream",
+              ].join(" ")}
+            >
+              {status === "SOLD" ? "Sold" : "Reserved"}
+            </span>
+          )}
+
           {extraCount > 0 && (
             <span className="pointer-events-none absolute bottom-2 right-2 rounded-full bg-charcoal/70 px-2 py-0.5 text-xs text-white">
               +{extraCount} more
@@ -93,12 +142,29 @@ export default function ProductCard({ product }: { product: Product }) {
               </button>
             )}
           </div>
+
+          {details.length > 0 && (
+            <dl className="grid grid-cols-2 gap-x-3 gap-y-1 border-t border-emerald/10 pt-2 text-xs text-charcoal-muted">
+              {details.map((d) => (
+                <div key={d.label}>
+                  <dt className="inline font-medium text-emerald">{d.label}: </dt>
+                  <dd className="inline">{d.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="mt-auto w-full rounded-full border border-emerald px-4 py-2 text-center text-sm text-emerald transition-colors hover:bg-emerald hover:text-cream"
+            disabled={status === "SOLD"}
+            className="mt-auto w-full rounded-full border border-emerald px-4 py-2 text-center text-sm text-emerald transition-colors hover:bg-emerald hover:text-cream disabled:cursor-not-allowed disabled:border-charcoal/20 disabled:text-charcoal-muted disabled:hover:bg-transparent"
           >
-            Inquire About This Piece
+            {status === "SOLD"
+              ? "This Piece Has Sold"
+              : status === "RESERVED"
+              ? "Reserved — Inquire Anyway"
+              : "Inquire About This Piece"}
           </button>
         </div>
       </div>

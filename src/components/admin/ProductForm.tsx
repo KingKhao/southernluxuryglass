@@ -11,6 +11,11 @@ type ProductFormValues = {
   description: string;
   images: string[];
   featured: boolean;
+  status: "AVAILABLE" | "RESERVED" | "SOLD";
+  dimensions?: string | null;
+  era?: string | null;
+  condition?: string | null;
+  maker?: string | null;
 };
 
 type CategoryOption = { id: string; name: string };
@@ -119,23 +124,100 @@ export default function ProductForm({
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm text-charcoal/70" htmlFor="cost">
+            Your cost (admin-only)
+          </label>
+          <input
+            id="cost"
+            name="cost"
+            type="number"
+            step="0.01"
+            min="0"
+            defaultValue={initialValues?.cost ?? ""}
+            placeholder="What you paid for this piece"
+            className={fieldClass}
+          />
+          <p className="mt-1 text-xs text-charcoal/50">
+            Only you see this — it never appears on the storefront.
+          </p>
+        </div>
+        <div>
+          <label className="block text-sm text-charcoal/70" htmlFor="status">
+            Status
+          </label>
+          <select
+            id="status"
+            name="status"
+            defaultValue={initialValues?.status ?? "AVAILABLE"}
+            className={fieldClass}
+          >
+            <option value="AVAILABLE">Available</option>
+            <option value="RESERVED">Reserved</option>
+            <option value="SOLD">Sold</option>
+          </select>
+          <p className="mt-1 text-xs text-charcoal/50">
+            Sold pieces stay visible with a Sold badge; the Inquire button turns off.
+          </p>
+        </div>
+      </div>
+
       <div>
-        <label className="block text-sm text-charcoal/70" htmlFor="cost">
-          Your cost (admin-only)
-        </label>
-        <input
-          id="cost"
-          name="cost"
-          type="number"
-          step="0.01"
-          min="0"
-          defaultValue={initialValues?.cost ?? ""}
-          placeholder="What you paid for this piece"
-          className={fieldClass}
-        />
-        <p className="mt-1 text-xs text-charcoal/50">
-          Only you see this — it never appears on the storefront.
+        <p className="block text-sm text-charcoal/70">Details (optional)</p>
+        <p className="mb-2 text-xs text-charcoal/50">
+          Shown on the piece only when filled in — leave any of these blank to omit them.
         </p>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs text-charcoal/70" htmlFor="dimensions">
+              Dimensions
+            </label>
+            <input
+              id="dimensions"
+              name="dimensions"
+              defaultValue={initialValues?.dimensions ?? ""}
+              placeholder={'e.g. 8"H x 4"W'}
+              className={fieldClass}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-charcoal/70" htmlFor="era">
+              Era
+            </label>
+            <input
+              id="era"
+              name="era"
+              defaultValue={initialValues?.era ?? ""}
+              placeholder="e.g. 1930s"
+              className={fieldClass}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-charcoal/70" htmlFor="condition">
+              Condition
+            </label>
+            <input
+              id="condition"
+              name="condition"
+              defaultValue={initialValues?.condition ?? ""}
+              placeholder="e.g. Excellent, no chips"
+              className={fieldClass}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-charcoal/70" htmlFor="maker">
+              Maker
+            </label>
+            <input
+              id="maker"
+              name="maker"
+              defaultValue={initialValues?.maker ?? ""}
+              placeholder="e.g. Fenton"
+              className={fieldClass}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Photos: drag-and-drop upload + thumbnails */}

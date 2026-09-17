@@ -16,17 +16,31 @@ model Category {
   createdAt DateTime  @default(now())
 }
 
+enum ProductStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+}
+
 model Product {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   name        String
   categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
+  category    Category      @relation(fields: [categoryId], references: [id])
   price       Float
   cost        Float?
   description String
-  images      String[] @default([])
-  featured    Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  images      String[]      @default([])
+  featured    Boolean       @default(false)
+  status      ProductStatus @default(AVAILABLE)
+  // Optional antique-specific detail fields, shown on the storefront only
+  // when Crystal fills them in — a blank field is simply omitted, never
+  // shown as "Unknown" or similar.
+  dimensions  String?
+  era         String?
+  condition   String?
+  maker       String?
+  createdAt   DateTime      @default(now())
 }
 
 model Event {

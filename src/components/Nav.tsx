@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE_NAME } from "@/lib/site";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const links = [
   { href: "/", label: "Home" },
@@ -12,6 +13,7 @@ const links = [
 
 export default function Nav() {
   const pathname = usePathname();
+  const { favorites, ready } = useFavorites();
 
   return (
     <header className="border-b border-emerald/10 bg-cream/95 backdrop-blur sticky top-0 z-30">
@@ -36,6 +38,18 @@ export default function Nav() {
               </Link>
             );
           })}
+          {ready && favorites.length > 0 && (
+            <Link
+              href="/gallery"
+              className="flex items-center gap-1 text-charcoal transition-colors hover:text-gold-deep"
+              aria-label={`${favorites.length} saved piece${favorites.length === 1 ? "" : "s"}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                <path d="M12 21s-7.5-4.6-10-9.1C.5 8.6 2 5 5.5 5c2 0 3.5 1.2 4.5 2.7C11 6.2 12.5 5 14.5 5 18 5 19.5 8.6 22 11.9 14.5 16.4 12 21 12 21Z" />
+              </svg>
+              {favorites.length}
+            </Link>
+          )}
         </nav>
       </div>
     </header>

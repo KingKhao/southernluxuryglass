@@ -1,4 +1,5 @@
 import { buildMonthGrid } from "@/lib/calendar";
+import { buildEventIcsDataUrl } from "@/lib/ics";
 
 type EventItem = {
   id: string;
@@ -76,15 +77,31 @@ export default function EventSchedule({ events }: { events: EventItem[] }) {
                 })}
               </p>
             </div>
-            <a
-              href={event.platformLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block whitespace-nowrap rounded-full bg-emerald px-5 py-2 text-sm text-cream transition-colors hover:bg-emerald-dark"
-            >
-              Watch on {event.platformName}
-              <span className="sr-only"> (opens in new tab)</span>
-            </a>
+            <div className="flex gap-2">
+              <a
+                href={buildEventIcsDataUrl({
+                  uid: event.id,
+                  title: event.title,
+                  start: event.date,
+                  description: `Watch on ${event.platformName}: ${event.platformLink}`,
+                  url: event.platformLink,
+                })}
+                download={`${event.title.replace(/[^a-z0-9]+/gi, "-")}.ics`}
+                className="inline-flex items-center whitespace-nowrap rounded-full border border-emerald px-4 py-2 text-sm text-emerald transition-colors hover:bg-emerald hover:text-cream"
+                aria-label={`Add ${event.title} to your calendar`}
+              >
+                + Calendar
+              </a>
+              <a
+                href={event.platformLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block whitespace-nowrap rounded-full bg-emerald px-5 py-2 text-sm text-cream transition-colors hover:bg-emerald-dark"
+              >
+                Watch on {event.platformName}
+                <span className="sr-only"> (opens in new tab)</span>
+              </a>
+            </div>
           </li>
         ))}
       </ul>

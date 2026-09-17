@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import ProductCard from "@/components/ProductCard";
+import { useFavorites } from "@/hooks/useFavorites";
 
 type Product = {
   id: string;
@@ -10,6 +11,11 @@ type Product = {
   price: number;
   description: string;
   images: string[];
+  status?: "AVAILABLE" | "RESERVED" | "SOLD";
+  dimensions?: string | null;
+  era?: string | null;
+  condition?: string | null;
+  maker?: string | null;
 };
 
 export default function GalleryGrid({
@@ -30,6 +36,8 @@ export default function GalleryGrid({
 
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [search, setSearch] = useState("");
+  const [savedOnly, setSavedOnly] = useState(false);
+  const { favorites, ready: favoritesReady } = useFavorites();
 
   const filtered = useMemo(
     () =>
@@ -40,9 +48,10 @@ export default function GalleryGrid({
           search.trim() === "" ||
           product.name.toLowerCase().includes(search.toLowerCase()) ||
           product.description.toLowerCase().includes(search.toLowerCase());
-        return matchesCategory && matchesSearch;
+        const matchesSaved = !savedOnly || favorites.includes(product.id);
+        return matchesCategory && matchesSearch && matchesSaved;
       }),
-    [products, activeCategory, search]
+    [products, activeCategory, search, savedOnly, favorites]
   );
 
   return (
@@ -65,6 +74,21 @@ export default function GalleryGrid({
               {category}
             </button>
           ))}
+          {favoritesReady && favorites.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setSavedOnly((v) => !v)}
+              aria-pressed={savedOnly}
+              className={[
+                "min-h-[44px] rounded-full border px-4 py-2 text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald",
+                savedOnly
+                  ? "border-emerald bg-emerald text-cream"
+                  : "border-emerald/60 text-emerald hover:bg-emerald/10",
+              ].join(" ")}
+            >
+              ♥ Saved ({favorites.length})
+            </button>
+          )}
         </div>
 
         <label htmlFor="gallery-search" className="sr-only">
@@ -88,8 +112,9 @@ export default function GalleryGrid({
         </div>
       ) : (
         <p className="py-12 text-center text-charcoal-muted">
-          No pieces match your search just yet — try a different category or
-          search term.
+          {savedOnly
+            ? "You haven't saved any pieces in this category yet — tap the heart on a piece you love."
+            : "No pieces match your search just yet — try a different category or search term."}
         </p>
       )}
     </div>

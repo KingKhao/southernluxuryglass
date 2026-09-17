@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSessionUsername } from "@/lib/session";
+import type { ProductStatus } from "@prisma/client";
+
+const PRODUCT_STATUSES: ProductStatus[] = ["AVAILABLE", "RESERVED", "SOLD"];
 
 async function requireAdmin() {
   const username = await getSessionUsername();
@@ -20,6 +23,14 @@ function readProductFields(formData: FormData) {
   const cost = rawCost === "" ? null : Number(rawCost);
   const description = String(formData.get("description") ?? "").trim();
   const featured = formData.get("featured") === "on";
+  const rawStatus = String(formData.get("status") ?? "AVAILABLE");
+  const status: ProductStatus = PRODUCT_STATUSES.includes(rawStatus as ProductStatus)
+    ? (rawStatus as ProductStatus)
+    : "AVAILABLE";
+  const dimensions = String(formData.get("dimensions") ?? "").trim() || null;
+  const era = String(formData.get("era") ?? "").trim() || null;
+  const condition = String(formData.get("condition") ?? "").trim() || null;
+  const maker = String(formData.get("maker") ?? "").trim() || null;
 
   let images: string[] = [];
   const rawImages = formData.get("images");
@@ -44,7 +55,7 @@ function readProductFields(formData: FormData) {
     throw new Error("Please add at least one product photo.");
   }
 
-  return { name, categoryId, price, cost, description, images, featured };
+  return { name, categoryId, price, cost, description, images, featured, status, dimensions, era, condition, maker };
 }
 
 export async function createProduct(formData: FormData) {

@@ -36,6 +36,11 @@ export default async function EditProductPage({
           description: product.description,
           images: product.images,
           featured: product.featured,
+          status: product.status,
+          dimensions: product.dimensions,
+          era: product.era,
+          condition: product.condition,
+          maker: product.maker,
         }}
       />
     </div>
