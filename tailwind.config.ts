@@ -39,6 +39,10 @@ const config: Config = {
         // without breaking the emerald/gold/charcoal palette the way a
         // stock Tailwind red does. ~7:1 on cream.
         error: "#8C3A2B",
+        // `error`'s light counterpart for error text on a solid-emerald
+        // background (e.g. the homepage signup section) — `error` itself is
+        // near-unreadable there (~1.3:1). ~4.7:1 on emerald.
+        "error-light": "#EDA48A",
       },
       fontFamily: {
         serif: ["var(--font-display)", "Georgia", "serif"],

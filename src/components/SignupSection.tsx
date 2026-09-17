@@ -9,7 +9,7 @@ export default function SignupSection() {
         they hit the site.
       </p>
       <div className="mt-6">
-        <SignupForm />
+        <SignupForm onDark />
       </div>
     </section>
   );
