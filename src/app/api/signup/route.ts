@@ -15,9 +15,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
+  // Honeypot: a hidden field real visitors never see or fill. A bot that
+  // fills every field on the form trips it; report success without writing
+  // anything, so the bot has no signal to learn from.
+  if (String(body.companyWebsite ?? "").trim() !== "") {
+    return NextResponse.json({ ok: true });
+  }
+
   const name = String(body.name ?? "").trim();
   const email = String(body.email ?? "").trim();
   const phone = String(body.phone ?? "").trim();
+  const smsConsent = body.smsConsent === true;
+  const smsConsentVersion = typeof body.smsConsentVersion === "string" ? body.smsConsentVersion : null;
 
   const missing = [!name && "name", !email && "email", !phone && "phone"].filter(
     (f): f is string => Boolean(f)
@@ -58,6 +67,8 @@ export async function POST(req: NextRequest) {
     summary: "Early-access signup",
     categoryOnCreate: "FOLLOWER",
     upgradeNewToFollower: true,
+    smsConsent,
+    smsConsentVersion,
   });
 
   return NextResponse.json({ ok: true });

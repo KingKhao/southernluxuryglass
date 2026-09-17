@@ -120,6 +120,15 @@ model Contact {
   history           ContactHistory[]
   createdAt         DateTime         @default(now())
 
+  // TCPA-relevant: express consent to receive SMS marketing (new-inventory
+  // texts), captured only via the Signup form's own checkbox — never
+  // inferred from providing a phone number for another purpose (e.g. an
+  // inquiry reply). Recorded with the exact document version so a future
+  // wording change can be told apart from consent given under old text.
+  smsConsent        Boolean          @default(false)
+  smsConsentVersion String?
+  smsConsentAt      DateTime?
+
   @@index([createdAt])
 }
 

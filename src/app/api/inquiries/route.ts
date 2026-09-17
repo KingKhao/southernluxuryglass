@@ -13,6 +13,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
+  // Honeypot: a hidden field real visitors never see or fill. A bot that
+  // fills every field on the form trips it; report success without writing
+  // anything, so the bot has no signal to learn from.
+  if (String(body.companyWebsite ?? "").trim() !== "") {
+    return NextResponse.json({ ok: true });
+  }
+
   const name = String(body.name ?? "").trim();
   const phone = String(body.phone ?? "").trim();
   const email = String(body.email ?? "").trim();

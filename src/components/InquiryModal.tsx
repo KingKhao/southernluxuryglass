@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Link from "next/link";
 import { useModalA11y } from "@/hooks/useModalA11y";
 
 const MAX_MESSAGE = 2000;
@@ -24,6 +25,7 @@ export default function InquiryModal({
       ? "Hi Crystal, I'd love to get in touch about "
       : `Hi Crystal, I'm interested in the "${productName}". Could you tell me more about it?`
   );
+  const [companyWebsite, setCompanyWebsite] = useState(""); // honeypot — real visitors never see or fill this
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -39,7 +41,7 @@ export default function InquiryModal({
       const res = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productName, productId, name, phone, email, message }),
+        body: JSON.stringify({ productName, productId, name, phone, email, message, companyWebsite }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -106,6 +108,20 @@ export default function InquiryModal({
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-3">
+            {/* Honeypot: invisible to real visitors, irresistible to simple bots. */}
+            <div className="absolute left-[-9999px] h-px w-px overflow-hidden" aria-hidden="true">
+              <label htmlFor="iq-company-website">Leave this field empty</label>
+              <input
+                id="iq-company-website"
+                name="company_website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={companyWebsite}
+                onChange={(e) => setCompanyWebsite(e.target.value)}
+              />
+            </div>
+
             <div>
               <label className="block text-sm text-charcoal-muted" htmlFor="iq-name">
                 Name
@@ -175,6 +191,17 @@ export default function InquiryModal({
             >
               {submitting ? "Sending…" : "Send Inquiry"}
             </button>
+            <p className="text-center text-xs text-charcoal-muted">
+              By submitting, you agree to our{" "}
+              <Link href="/terms" className="underline hover:text-charcoal">
+                Terms
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="underline hover:text-charcoal">
+                Privacy Policy
+              </Link>
+              .
+            </p>
           </form>
         )}
       </div>

@@ -61,9 +61,20 @@ export default async function Footer() {
           </div>
         </div>
 
-        <p className="mt-10 text-xs text-cream/70">
-          &copy; {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
-        </p>
+        <div className="mt-10 flex flex-col gap-3 border-t border-cream/10 pt-6 text-xs text-cream/70 sm:flex-row sm:items-center sm:justify-between">
+          <p>&copy; {new Date().getFullYear()} {SITE_NAME}. All rights reserved.</p>
+          <nav className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link href="/privacy" className="hover:text-gold-light">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-gold-light">
+              Terms of Service
+            </Link>
+            <Link href="/accessibility" className="hover:text-gold-light">
+              Accessibility
+            </Link>
+          </nav>
+        </div>
       </div>
     </footer>
   );

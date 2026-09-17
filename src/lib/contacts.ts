@@ -10,6 +10,12 @@ export type ContactSubmission = {
   detail?: string | null; // the message, if any
   categoryOnCreate?: ContactCategory; // default NEW
   upgradeNewToFollower?: boolean; // signups: promote an untouched NEW contact to FOLLOWER
+  // TCPA SMS-marketing consent — only ever passed by the signup form's own
+  // checkbox. Left undefined by every other caller (inquiries, manual admin
+  // entries) so this function never touches consent fields on their behalf;
+  // see the upsert below for why that distinction matters.
+  smsConsent?: boolean;
+  smsConsentVersion?: string | null;
 };
 
 // Single source of truth for adding a contact from any form. Auto-merges by
@@ -27,6 +33,16 @@ export async function recordContactSubmission(input: ContactSubmission): Promise
   const name = input.name.trim();
   const phone = input.phone.trim();
 
+  // Only the signup form ever sets this key at all (always to a real
+  // true/false, never leaves it undefined) — inquiries and manual entries
+  // omit it entirely. That's the signal used below: a caller that didn't
+  // address SMS consent must never grant, and must never silently revoke,
+  // whatever consent state already exists on the contact. Consent is only
+  // ever *granted* here (set true + re-stamped); an unchecked box on some
+  // later, unrelated submission is not treated as a revocation — a real
+  // opt-out needs its own explicit action once outbound texting exists.
+  const grantingSmsConsent = input.smsConsent === true;
+
   const contact = await prisma.contact.upsert({
     where: { email },
     create: {
@@ -35,16 +51,18 @@ export async function recordContactSubmission(input: ContactSubmission): Promise
       phone,
       productOfInterest: input.summary,
       category: input.categoryOnCreate ?? "NEW",
+      ...(grantingSmsConsent
+        ? { smsConsent: true, smsConsentVersion: input.smsConsentVersion ?? null, smsConsentAt: new Date() }
+        : {}),
     },
-    update: phone ? { phone } : {},
+    update: {
+      ...(phone ? { phone } : {}),
+      ...(grantingSmsConsent
+        ? { smsConsent: true, smsConsentVersion: input.smsConsentVersion ?? null, smsConsentAt: new Date() }
+        : {}),
+    },
   });
 
-  // A NEW contact gets promoted to FOLLOWER on repeat contact, but must
-  // never downgrade an existing BUYER/B2B/FOLLOWER back to FOLLOWER — so
-  // this is its own conditional update (`WHERE category = 'NEW'`), which
-  // Postgres executes atomically. If two of these race for the same
-  // contact, only the first has any effect; the second's WHERE matches
-  // zero rows once the first has already flipped the category.
   if (input.upgradeNewToFollower) {
     await prisma.contact.updateMany({
       where: { id: contact.id, category: "NEW" },
