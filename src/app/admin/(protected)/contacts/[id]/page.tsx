@@ -46,10 +46,26 @@ export default async function ContactDetailPage({
           </p>
         )}
         {contact.phone && (
-          <p>
+          <p className="flex items-center gap-2">
             <a href={`tel:${contact.phone}`} className="text-emerald hover:underline">
               {contact.phone}
             </a>
+            {contact.smsConsent ? (
+              <span
+                className="rounded-full bg-emerald/10 px-2 py-0.5 text-xs font-medium text-emerald"
+                title={
+                  contact.smsConsentAt
+                    ? `Agreed to SMS marketing on ${contact.smsConsentAt.toLocaleString()} (v${contact.smsConsentVersion ?? "?"})`
+                    : undefined
+                }
+              >
+                ✓ OK to text
+              </span>
+            ) : (
+              <span className="rounded-full bg-charcoal/5 px-2 py-0.5 text-xs text-charcoal/50">
+                Not opted in to texts
+              </span>
+            )}
           </p>
         )}
         {contact.productOfInterest && <p>Interested in: {contact.productOfInterest}</p>}

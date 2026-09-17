@@ -23,7 +23,7 @@ export async function GET() {
     include: { history: { orderBy: { createdAt: "asc" } } },
   });
 
-  const header = ["Name", "Email", "Phone", "Label", "Inquiry History"];
+  const header = ["Name", "Email", "Phone", "Label", "SMS OK?", "Inquiry History"];
   const rows = contacts.map((c) => {
     const history = c.history
       .map((h) => {
@@ -32,7 +32,8 @@ export async function GET() {
         return `[${date}] ${h.summary}${detail}`;
       })
       .join(" | ");
-    return [c.name, c.email, c.phone, c.category, history].map(csvCell).join(",");
+    const smsOk = c.smsConsent ? "Yes" : "No";
+    return [c.name, c.email, c.phone, c.category, smsOk, history].map(csvCell).join(",");
   });
 
   const csv = [header.map(csvCell).join(","), ...rows].join("\r\n");

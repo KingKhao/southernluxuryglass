@@ -109,6 +109,7 @@ export default async function AdminContactsPage({
               <th className="px-4 py-3">Category</th>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Phone</th>
+              <th className="px-4 py-3">SMS OK?</th>
               <th className="px-4 py-3">Interested in</th>
             </tr>
           </thead>
@@ -134,12 +135,21 @@ export default async function AdminContactsPage({
                 </td>
                 <td className="px-4 py-3 text-charcoal/70">{c.email || "—"}</td>
                 <td className="px-4 py-3 text-charcoal/70">{c.phone || "—"}</td>
+                <td className="px-4 py-3">
+                  {c.smsConsent ? (
+                    <span className="rounded-full bg-emerald/10 px-2.5 py-0.5 text-xs font-medium text-emerald">
+                      Yes
+                    </span>
+                  ) : (
+                    <span className="text-xs text-charcoal/40">No</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-charcoal/70">{c.productOfInterest ?? "—"}</td>
               </tr>
             ))}
             {contacts.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-charcoal/60">
+                <td colSpan={6} className="px-4 py-6 text-center text-charcoal/60">
                   No contacts in this view.
                 </td>
               </tr>
