@@ -1,0 +1,6 @@
+.local-preview/
+.playwright-cli/
+.next/
+.env*
+outputs/
+node_modules/
