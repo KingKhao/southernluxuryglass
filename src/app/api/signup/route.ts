@@ -58,7 +58,9 @@ export async function POST(req: NextRequest) {
     where: {
       source: "signup",
       createdAt: { gte: since },
-      contact: { OR: [{ email }, { phone }] },
+      // An omitted optional phone must not group every email-only visitor
+      // into one shared "blank phone" quota.
+      contact: { OR: [{ email }, ...(phone ? [{ phone }] : [])] },
     },
   });
   if (recent >= MAX_PER_WINDOW) {

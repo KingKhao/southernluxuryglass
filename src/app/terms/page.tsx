@@ -93,9 +93,8 @@ export default function TermsPage() {
             is,&rdquo; without warranties of any kind, to the fullest extent
             the law allows. {SITE_NAME} is not liable for indirect,
             incidental, or consequential damages arising from your use of
-            this site, to the fullest extent the law allows. (Placeholder —
-            an attorney should confirm this section is enforceable and
-            appropriately scoped for your state.)
+            this site, to the fullest extent the law allows. This draft
+            liability section requires legal review before reliance.
           </p>
         </section>
 
@@ -103,8 +102,8 @@ export default function TermsPage() {
           <h2 className="font-serif text-xl text-emerald">Governing law</h2>
           <p className="mt-2">
             These terms are governed by the laws of Tennessee,
-            without regard to conflict-of-law principles. (Placeholder —
-            fill in once your business&apos;s home state is confirmed.)
+            without regard to conflict-of-law principles, subject to
+            applicable mandatory consumer protections.
           </p>
         </section>
 

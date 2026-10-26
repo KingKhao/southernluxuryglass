@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="font-serif text-xl text-emerald">Who we are</h2>
           <p className="mt-2">
-            {SITE_NAME} is curated by {CURATOR_NAME}. This policy covers the{" "}
+            {SITE_NAME} is curated by {CURATOR_NAME} in Morristown, Tennessee. This policy covers the{" "}
             {SITE_NAME} website only.
           </p>
         </section>

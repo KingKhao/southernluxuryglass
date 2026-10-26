@@ -61,3 +61,24 @@ test("subject erasure handles separate inquiry copies inside one transaction", a
  assert.equal(await eraseContact("fixture", db as unknown as Parameters<typeof eraseContact>[1]), 1);
  assert.deepEqual(calls, ["transaction", "inquiry", "contact/history/notes"]);
 });
+
+test("email-only signup does not inherit unrelated blank-phone quotas", async () => {
+ let created = 0;
+ const tx = { loginAttempt: { count: async () => 0, createMany: async () => ({ count: 2 }), deleteMany: async () => ({ count: 0 }) } };
+ Object.assign(fake, {
+   $transaction: async (fn: (arg: typeof tx) => Promise<boolean>) => fn(tx),
+   contactHistory: {
+     count: async ({ where }: { where: { contact: { OR: Array<{ email?: string; phone?: string }> } } }) => where.contact.OR.some(clause => clause.phone === "") ? 10 : 0,
+     create: async () => ({ id: "synthetic-history" }),
+   },
+   contact: {
+     upsert: async () => { created++; return { id: "synthetic-contact" }; },
+     updateMany: async () => ({ count: 1 }),
+   },
+ });
+ const { POST } = await import("../src/app/api/signup/route");
+ const { NextRequest } = await import("next/server");
+ const response = await POST(new NextRequest("https://fixture.invalid/api/signup", { method: "POST", body: JSON.stringify({ name: "Synthetic Visitor", email: "new@example.invalid", phone: "", smsConsent: false }) }));
+ assert.equal(response.status, 200);
+ assert.equal(created, 1);
+});
