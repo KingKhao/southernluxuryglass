@@ -19,15 +19,14 @@ export default async function GalleryPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16">
-      <div className="mb-10 text-center">
+    <div className="mx-auto max-w-6xl px-6 py-10 sm:py-16">
+      <div className="mb-7 text-center sm:mb-10">
         <h1 className="font-serif text-3xl text-emerald sm:text-4xl">
           The Gallery
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-charcoal-muted">
-          Every piece currently available, from delicate cordial glasses to
-          statement vases. Fall in love, then reach out — nothing here can be
-          purchased online yet, just inquired about.
+          Find a piece you love, save it, and ask Crystal. Purchases are arranged
+          personally by invoice, not through an online checkout.
         </p>
       </div>
       <GalleryGrid

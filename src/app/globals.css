@@ -37,3 +37,41 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Storefront experience: the incumbent cream, emerald, gold and typefaces remain the authority. */
+:root { --slg-ease-out: cubic-bezier(0.23, 1, 0.32, 1); --slg-fast: 160ms; --slg-enter: 240ms; }
+html { scroll-padding-top: 132px; -webkit-text-size-adjust: 100%; }
+::selection { background: #2F4A3D; color: #FAF6EE; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button, a { touch-action: manipulation; }
+input, textarea, select { caret-color: #2F4A3D; font-size: 16px; }
+.slg-skip { position: fixed; left: 16px; top: -100px; z-index: 100; background: #FAF6EE; color: #2F4A3D; padding: 14px 22px; border: 2px solid #2F4A3D; }
+.slg-skip:focus { top: 12px; }
+.slg-product { min-width: 0; }
+.slg-product h3, .slg-dialog h2, .slg-lightbox h2 { overflow-wrap: anywhere; }
+.slg-product-image { transition: transform 280ms var(--slg-ease-out); }
+.slg-save svg { transition: transform var(--slg-fast) var(--slg-ease-out); }
+.slg-save[aria-pressed="true"] { background: #2F4A3D; }
+.slg-save[aria-pressed="true"] svg { transform: scale(1.1); }
+.slg-save:active svg { transform: scale(.95); }
+.slg-overlay { animation: slg-overlay-in 180ms var(--slg-ease-out) both; }
+.slg-dialog, .slg-lightbox { animation: slg-dialog-in var(--slg-enter) var(--slg-ease-out) both; }
+.slg-invitation { animation: slg-dialog-in var(--slg-enter) var(--slg-ease-out) both; bottom: max(16px, env(safe-area-inset-bottom)); }
+.slg-lightbox { overscroll-behavior: contain; }
+.slg-dialog { overscroll-behavior: contain; }
+.slg-lightbox :focus-visible { outline-color: #C7A876; }
+.slg-dialog button:active { background-color: #F3ECDD; }
+.gallery-controls button:active { transform: scale(.98); }
+.slg-dialog button[type="submit"]:active { background-color: #1F332A; }
+.gallery-controls button { flex-shrink: 0; }
+@media (hover:hover) and (pointer:fine) {
+  .slg-product button:hover .slg-product-image { transform: scale(1.035); }
+}
+@keyframes slg-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slg-dialog-in { from { opacity: .4; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (min-width:640px) { html {scroll-padding-top: 100px;} }
+@media (max-width:639px) { .slg-dialog input,.slg-dialog textarea,.slg-dialog select {font-size:16px;} }
+@media (prefers-reduced-motion:reduce) {
+  .slg-overlay,.slg-dialog,.slg-lightbox,.slg-invitation {animation:none;}
+  .slg-product-image,.slg-save svg {transition:none;transform:none!important;}
+}

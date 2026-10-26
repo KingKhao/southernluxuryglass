@@ -10,11 +10,15 @@ export default function InquiryModal({
   productName,
   productId,
   general = false,
+  productPrice,
+  productImage,
   onClose,
 }: {
   productName: string;
   productId?: string;
   general?: boolean;
+  productPrice?: number;
+  productImage?: string;
   onClose: () => void;
 }) {
   const [name, setName] = useState("");
@@ -61,7 +65,7 @@ export default function InquiryModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/50 p-4"
+      className="slg-overlay fixed inset-0 z-50 flex items-center justify-center bg-charcoal/50 p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -69,7 +73,7 @@ export default function InquiryModal({
     >
       <div
         ref={containerRef}
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-cream p-6 shadow-xl"
+        className="slg-dialog max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-lg bg-cream p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-start justify-between">
@@ -77,7 +81,7 @@ export default function InquiryModal({
             <h2 id="iq-title" className="font-serif text-xl text-emerald">
               {general ? "Contact Crystal" : "Inquire About This Piece"}
             </h2>
-            {!general && <p className="text-sm text-charcoal-muted">{productName}</p>}
+            {!general && <p className="mt-2 text-sm text-charcoal-muted">{productName}</p>}
           </div>
           <button
             type="button"
@@ -108,6 +112,11 @@ export default function InquiryModal({
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-3">
+            {!general && (productImage || productPrice !== undefined) && <div className="mb-4 flex items-center gap-4 rounded-md bg-ivory p-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {productImage && <img src={productImage} alt="" className="h-16 w-14 shrink-0 rounded object-cover"/>}
+              <div>{productPrice !== undefined && <p className="font-semibold text-gold-deep">{new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:Number.isInteger(productPrice)?0:2}).format(productPrice)}</p>}<p className="text-sm text-charcoal-muted">An inquiry, not a purchase or reservation.</p></div>
+            </div>}
             {/* Honeypot: invisible to real visitors, irresistible to simple bots. */}
             <div className="absolute left-[-9999px] h-px w-px overflow-hidden" aria-hidden="true">
               <label htmlFor="iq-company-website">Leave this field empty</label>
@@ -126,7 +135,7 @@ export default function InquiryModal({
               <label className="block text-sm text-charcoal-muted" htmlFor="iq-name">
                 Name
               </label>
-              <input id="iq-name" required value={name} onChange={(e) => setName(e.target.value)} className={field} />
+              <input id="iq-name" required autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} className={field} />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
@@ -136,6 +145,8 @@ export default function InquiryModal({
                 <input
                   id="iq-phone"
                   type="tel"
+                  autoComplete="tel"
+                  maxLength={30}
                   required
                   aria-describedby="iq-phone-hint"
                   value={phone}
@@ -153,6 +164,8 @@ export default function InquiryModal({
                 <input
                   id="iq-email"
                   type="email"
+                  autoComplete="email"
+                  maxLength={254}
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
