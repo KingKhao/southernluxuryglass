@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 const STORAGE_KEY = "slg_favorites";
+const CHANGE_EVENT = "slg:favorites-changed";
+let sessionFavorites: string[] = [];
 
 // Per-browser "saved pieces" list — no account/login needed. Reads/writes
 // localStorage directly, so it's private to this visitor's device and never
@@ -19,7 +21,7 @@ export function useFavorites() {
       const parsed = raw ? JSON.parse(raw) : [];
       return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : [];
     } catch {
-      return [];
+      return sessionFavorites;
     }
   }, []);
 
@@ -30,26 +32,34 @@ export function useFavorites() {
       if (e.key === STORAGE_KEY) setFavorites(read());
     };
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    const sync = () => setFavorites(read());
+    window.addEventListener(CHANGE_EVENT, sync);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(CHANGE_EVENT, sync);
+    };
   }, [read]);
 
   const write = useCallback((next: string[]) => {
     setFavorites(next);
+    sessionFavorites = next;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch {
       // Private browsing / storage disabled: state still updates for this
       // session, it just won't persist across reloads.
     }
+    window.dispatchEvent(new Event(CHANGE_EVENT));
   }, []);
 
   const isFavorite = useCallback((id: string) => favorites.includes(id), [favorites]);
 
   const toggleFavorite = useCallback(
     (id: string) => {
-      write(favorites.includes(id) ? favorites.filter((f) => f !== id) : [...favorites, id]);
+      const current = read();
+      write(current.includes(id) ? current.filter((f) => f !== id) : [...current, id]);
     },
-    [favorites, write]
+    [read, write]
   );
 
   return { favorites, isFavorite, toggleFavorite, ready };

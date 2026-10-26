@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Lato } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import StorefrontMotion from "@/components/StorefrontMotion";
 
 const display = Playfair_Display({
   subsets: ["latin"],
@@ -19,6 +20,8 @@ const body = Lato({
 const TITLE = "Southern Luxury Glass | Curated by Crystal Brisbois";
 const DESCRIPTION =
   "Curated antique and vintage glassware from Southern Luxury Glass — vases, dinnerware, glasses, décor, and serveware with history and character.";
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#FAF6EE" };
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://southernluxuryglass.vercel.app"),
@@ -46,9 +49,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${display.variable} ${body.variable} font-sans antialiased flex min-h-screen flex-col`}>
+        <a href="#main-content" className="slg-skip">Skip to content</a>
         <Nav />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" tabIndex={-1} className="flex-1">{children}</main>
         <Footer />
+        <StorefrontMotion />
       </body>
     </html>
   );

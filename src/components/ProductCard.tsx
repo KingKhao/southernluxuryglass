@@ -29,6 +29,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
   const cover = product.images[0];
   const extraCount = Math.max(0, product.images.length - 1);
@@ -45,10 +46,10 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <>
-      <div className="flex flex-col overflow-hidden rounded-lg border border-emerald/15 bg-white/70 shadow-sm transition-shadow hover:shadow-md">
+      <article className="slg-product flex flex-col overflow-hidden rounded-lg border border-emerald/15 bg-white/70 shadow-sm transition-shadow hover:shadow-md">
         {/* Tall portrait image — the star of the card */}
         <div className="relative aspect-[4/5] w-full overflow-hidden bg-ivory">
-          {cover ? (
+          {cover && !imageFailed ? (
             <button
               type="button"
               onClick={() => setLightboxOpen(true)}
@@ -65,7 +66,8 @@ export default function ProductCard({ product }: { product: Product }) {
                 alt={product.name}
                 loading="lazy"
                 decoding="async"
-                className={`h-full w-full object-cover transition-transform duration-500 hover:scale-105 ${
+                onError={() => setImageFailed(true)}
+                className={`slg-product-image h-full w-full object-cover ${
                   status === "SOLD" ? "grayscale" : ""
                 }`}
               />
@@ -77,7 +79,8 @@ export default function ProductCard({ product }: { product: Product }) {
                 <circle cx="9" cy="9" r="2" />
                 <path d="m21 15-5-5L5 21" />
               </svg>
-              <span className="font-serif text-sm italic">Photo coming soon</span>
+              <span className="font-serif text-sm italic">{imageFailed ? "Photo unavailable" : "Photo coming soon"}</span>
+              {imageFailed && <button type="button" onClick={() => setImageFailed(false)} className="min-h-[44px] px-4 text-sm text-emerald underline">Retry photo</button>}
             </div>
           )}
 
@@ -86,7 +89,7 @@ export default function ProductCard({ product }: { product: Product }) {
             onClick={() => toggleFavorite(product.id)}
             aria-label={saved ? `Remove ${product.name} from saved pieces` : `Save ${product.name}`}
             aria-pressed={saved}
-            className="absolute left-2 top-2 flex h-9 w-9 items-center justify-center rounded-full bg-charcoal/50 text-white backdrop-blur-sm transition-colors hover:bg-charcoal/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light"
+            className="slg-save absolute left-2 top-2 flex h-11 w-11 items-center justify-center rounded-full bg-charcoal/70 text-white backdrop-blur-sm transition-colors hover:bg-charcoal/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-light"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -136,7 +139,8 @@ export default function ProductCard({ product }: { product: Product }) {
               <button
                 type="button"
                 onClick={() => setExpanded((v) => !v)}
-                className="mt-1 text-sm font-medium text-emerald hover:underline"
+                aria-expanded={expanded}
+                className="mt-1 min-h-[44px] text-sm font-medium text-emerald hover:underline"
               >
                 {expanded ? "Show less" : "Show more"}
               </button>
@@ -158,7 +162,7 @@ export default function ProductCard({ product }: { product: Product }) {
             type="button"
             onClick={() => setOpen(true)}
             disabled={status === "SOLD"}
-            className="mt-auto w-full rounded-full border border-emerald px-4 py-2 text-center text-sm text-emerald transition-colors hover:bg-emerald hover:text-cream disabled:cursor-not-allowed disabled:border-charcoal/20 disabled:text-charcoal-muted disabled:hover:bg-transparent"
+            className="mt-auto min-h-[48px] w-full rounded-full border border-emerald px-4 py-2 text-center text-sm text-emerald transition-colors hover:bg-emerald hover:text-cream disabled:cursor-not-allowed disabled:border-charcoal/20 disabled:text-charcoal-muted disabled:hover:bg-transparent"
           >
             {status === "SOLD"
               ? "This Piece Has Sold"
@@ -167,12 +171,14 @@ export default function ProductCard({ product }: { product: Product }) {
               : "Inquire About This Piece"}
           </button>
         </div>
-      </div>
+      </article>
 
       {open && (
         <InquiryModal
           productName={product.name}
           productId={product.id}
+          productPrice={product.price}
+          productImage={cover}
           onClose={() => setOpen(false)}
         />
       )}

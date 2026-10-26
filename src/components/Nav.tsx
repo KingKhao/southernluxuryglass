@@ -21,7 +21,7 @@ export default function Nav() {
         <Link href="/" className="whitespace-nowrap font-serif text-lg tracking-wide text-emerald sm:text-xl">
           {SITE_NAME}
         </Link>
-        <nav className="flex items-center gap-5 text-xs uppercase tracking-wider text-charcoal sm:gap-8 sm:text-sm">
+        <nav aria-label="Main navigation" className="flex max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs uppercase tracking-wider text-charcoal sm:gap-8 sm:text-sm">
           {links.map((link) => {
             const active = pathname === link.href;
             return (
@@ -30,7 +30,7 @@ export default function Nav() {
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={[
-                  "transition-colors hover:text-gold-deep",
+                  "inline-flex min-h-[44px] items-center transition-colors hover:text-gold-deep",
                   active ? "text-gold-deep" : "",
                 ].join(" ")}
               >
@@ -38,11 +38,17 @@ export default function Nav() {
               </Link>
             );
           })}
-          {ready && favorites.length > 0 && (
+          {ready && (
             <Link
-              href="/gallery"
-              className="flex items-center gap-1 text-charcoal transition-colors hover:text-gold-deep"
-              aria-label={`${favorites.length} saved piece${favorites.length === 1 ? "" : "s"}`}
+              href="/gallery?saved=1"
+              onClick={(event) => {
+                if (pathname !== "/gallery" || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                event.preventDefault();
+                window.history.pushState(window.history.state, "", "/gallery?saved=1");
+                window.dispatchEvent(new PopStateEvent("popstate", { state: window.history.state }));
+              }}
+              className="inline-flex min-h-[44px] items-center gap-1 text-charcoal transition-colors hover:text-gold-deep"
+              aria-label={`View ${favorites.length} saved piece${favorites.length === 1 ? "" : "s"}`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
                 <path d="M12 21s-7.5-4.6-10-9.1C.5 8.6 2 5 5.5 5c2 0 3.5 1.2 4.5 2.7C11 6.2 12.5 5 14.5 5 18 5 19.5 8.6 22 11.9 14.5 16.4 12 21 12 21Z" />

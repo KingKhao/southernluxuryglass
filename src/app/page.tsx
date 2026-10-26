@@ -39,7 +39,7 @@ export default async function HomePage() {
           a dark scrim so the hero copy stays legible over it. Same copy,
           same CTA — staged at the scale the rest of the brand already
           implies instead of sitting in a flat text-only box. */}
-      <section className="relative flex min-h-[75vh] items-center overflow-hidden sm:min-h-[85vh]">
+      <section className="relative flex min-h-[75svh] items-center overflow-hidden sm:min-h-[85svh]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={home.heroImageUrl}
@@ -55,7 +55,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-charcoal/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/70 to-charcoal/40 sm:bg-gradient-to-r sm:from-charcoal/95 sm:via-charcoal/75 sm:to-charcoal/20" />
 
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-20 text-center sm:text-left">
+        <div data-storefront-reveal className="relative z-10 mx-auto w-full max-w-6xl px-6 py-20 text-center sm:text-left">
           <p className="font-serif text-sm uppercase tracking-[0.3em] text-gold-light">
             {home.heroEyebrow}
           </p>
@@ -71,10 +71,11 @@ export default async function HomePage() {
           >
             Browse the Gallery
           </Link>
+          <p className="mt-4 text-sm text-cream/85">Save a favorite. Ask Crystal. Arrange your purchase personally.</p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section data-storefront-reveal className="mx-auto max-w-6xl px-6 py-16">
         <h2 className="mb-8 text-center font-serif text-3xl text-emerald sm:text-4xl">
           Featured Pieces
         </h2>
@@ -105,9 +106,10 @@ export default async function HomePage() {
             meantime.
           </p>
         )}
+        <div className="mt-10 text-center"><Link href="/gallery" className="inline-flex min-h-[48px] items-center rounded-full border border-emerald px-7 py-3 text-emerald transition-colors hover:bg-emerald hover:text-cream">Explore the full collection</Link></div>
       </section>
 
-      <section id="live-shows" className="mx-auto max-w-6xl px-6 py-16">
+      <section data-storefront-reveal id="live-shows" className="mx-auto max-w-6xl px-6 py-16">
         <h2 className="mb-8 text-center font-serif text-3xl text-emerald sm:text-4xl">
           Upcoming Live Shows
         </h2>
@@ -119,7 +121,7 @@ export default async function HomePage() {
           most personal moment. Same copy, same link, same photo family
           (crystal-about.png — the seated portrait, since crystal-home.png
           now leads the hero above). */}
-      <section className="bg-emerald px-6 py-16 text-cream">
+      <section data-storefront-reveal className="bg-emerald px-6 py-16 text-cream">
         <div className="mx-auto grid max-w-5xl items-center gap-10 sm:grid-cols-2">
           <div className="flex justify-center sm:order-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}

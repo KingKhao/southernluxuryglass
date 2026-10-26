@@ -32,6 +32,9 @@ next-env.d.ts
 
 .vercel
 .env*
+.local-preview/
+.playwright-cli/
+outputs/
 
 # local staging area for product photos not yet uploaded through the admin panel
 /photo-drop

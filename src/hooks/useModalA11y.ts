@@ -2,63 +2,49 @@
 
 import { useEffect, useRef } from "react";
 
-const FOCUSABLE =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const stack: symbol[] = [];
+let originalOverflow = "";
 
-// Standard dialog keyboard behavior, shared by InquiryModal and SignupPopup:
-// - Escape closes.
-// - Tab/Shift+Tab cycles within the dialog instead of escaping to the page
-//   behind the overlay.
-// - The first focusable element gets focus when the dialog opens.
-// - Focus returns to whatever triggered the dialog when it closes.
 export function useModalA11y(open: boolean, onClose: () => void) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<Element | null>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
 
   useEffect(() => {
     if (!open) return;
-    triggerRef.current = document.activeElement;
-
+    const token = Symbol("dialog");
+    const trigger = document.activeElement;
     const container = containerRef.current;
-    const focusables = container
-      ? Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE))
-      : [];
-    // The close button is usually first in DOM order (top-right of the
-    // dialog) — autofocusing it means a reflexive Enter/Space dismisses the
-    // dialog instead of engaging the first real field. Prefer the first
-    // focusable element that isn't the close button; fall back to it only
-    // if nothing else is focusable.
-    const initialFocus =
-      focusables.find((el) => !el.hasAttribute("data-modal-close")) ?? focusables[0];
-    initialFocus?.focus();
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (e.key !== "Tab" || !container) return;
-      const items = Array.from(
-        container.querySelectorAll<HTMLElement>(FOCUSABLE)
-      ).filter((el) => el.offsetParent !== null);
-      if (items.length === 0) return;
-      const first = items[0];
-      const last = items[items.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
+    const items = () => container ? Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(el => el.tabIndex >= 0 && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden") : [];
+    if (!stack.length) { originalOverflow = document.body.style.overflow; document.body.style.overflow = "hidden"; }
+    stack.push(token);
+    const first = items().find(el => !el.hasAttribute("data-modal-close")) ?? items()[0];
+    if (!first && container) container.tabIndex = -1;
+    (first ?? container)?.focus();
+    const isTop = () => stack[stack.length - 1] === token;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!isTop()) return;
+      if (event.key === "Escape") { event.preventDefault(); closeRef.current(); return; }
+      if (event.key !== "Tab") return;
+      const controls = items(), first = controls[0], last = controls[controls.length - 1];
+      if (!controls.length) { event.preventDefault(); container?.focus(); return; }
+      if (event.shiftKey && (document.activeElement === first || !container?.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && (document.activeElement === last || !container?.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
     };
-
+    const keepFocus = (event: FocusEvent) => {
+      if (isTop() && event.target instanceof Node && !container?.contains(event.target)) (items()[0] ?? container)?.focus();
+    };
     window.addEventListener("keydown", onKeyDown);
+    document.addEventListener("focusin", keepFocus);
     return () => {
+      const index = stack.indexOf(token);
+      if (index !== -1) stack.splice(index, 1);
       window.removeEventListener("keydown", onKeyDown);
-      if (triggerRef.current instanceof HTMLElement) triggerRef.current.focus();
+      document.removeEventListener("focusin", keepFocus);
+      if (!stack.length) document.body.style.overflow = originalOverflow;
+      if (trigger instanceof HTMLElement && trigger.isConnected) trigger.focus({ preventScroll: true });
     };
-  }, [open, onClose]);
-
+  }, [open]);
   return containerRef;
 }
