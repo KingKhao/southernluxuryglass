@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import EventForm from "@/components/admin/EventForm";
@@ -13,9 +15,10 @@ function toDateTimeLocalValue(date: Date) {
 export default async function EditEventPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const event = await prisma.event.findUnique({ where: { id: params.id } });
+  if (!(await getSessionUsername())) redirect("/admin/login");
+  const event = await prisma.event.findUnique({ where: { id: (await params).id } });
 
   if (!event) {
     notFound();

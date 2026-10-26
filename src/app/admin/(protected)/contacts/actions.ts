@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { eraseContact } from "@/lib/erase-contact";
 import { prisma } from "@/lib/prisma";
 import { getSessionUsername } from "@/lib/session";
 import type { ContactCategory } from "@prisma/client";
@@ -53,7 +54,7 @@ export async function addContactNote(id: string, formData: FormData) {
 
 export async function deleteContact(id: string) {
   await requireAdmin();
-  await prisma.contact.delete({ where: { id } });
+  await eraseContact(id);
   revalidatePath("/admin/contacts");
   redirect("/admin/contacts");
 }

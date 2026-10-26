@@ -41,3 +41,17 @@ outputs/
 /public/products
 .scratch_cookies*
 export_check*.csv
+
+# Local credentials, private exports and generated audit/build files
+.env*
+!.env.example
+.vercel/
+.playwright-cli/
+node_modules/
+.next/
+*.tsbuildinfo
+*.csv
+*.db
+*.pem
+*.key
+.scratch*

@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -14,10 +16,11 @@ const CATEGORIES = ["NEW", "FOLLOWER", "BUYER", "B2B"] as const;
 export default async function ContactDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  if (!(await getSessionUsername())) redirect("/admin/login");
   const contact = await prisma.contact.findUnique({
-    where: { id: params.id },
+    where: { id: (await params).id },
     include: {
       notes: { orderBy: { createdAt: "desc" } },
       history: { orderBy: { createdAt: "desc" } },
@@ -101,7 +104,7 @@ export default async function ContactDetailPage({
         <p className="mb-3 text-sm font-medium text-charcoal/80">
           Inquiry history{" "}
           <span className="font-normal text-charcoal/40">
-            (permanent — kept even if an inquiry is deleted)
+            (retained when one inquiry is deleted; removed with full contact erasure)
           </span>
         </p>
         <ul className="space-y-3">
@@ -165,7 +168,7 @@ export default async function ContactDetailPage({
           type="submit"
           className="text-sm text-red-700 hover:underline"
         >
-          Delete this contact
+          Erase contact and matching inquiries
         </button>
       </form>
     </div>

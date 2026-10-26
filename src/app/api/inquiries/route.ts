@@ -1,3 +1,4 @@
+import { readFormBody, field, allowPublicForm, PublicFormError } from "@/lib/public-forms";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { recordContactSubmission } from "@/lib/contacts";
@@ -8,9 +9,10 @@ const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+    if (!(await allowPublicForm(req))) return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    body = await readFormBody(req);
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof PublicFormError ? error.message : "Unable to accept the request. Please try again later." }, { status: error instanceof PublicFormError ? error.status : 503 });
   }
 
   // Honeypot: a hidden field real visitors never see or fill. A bot that
@@ -20,11 +22,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  const name = String(body.name ?? "").trim();
-  const phone = String(body.phone ?? "").trim();
-  const email = String(body.email ?? "").trim();
-  const message = String(body.message ?? "").trim();
-  const productName = String(body.productName ?? "").trim() || "General inquiry";
+
+  try {
+    field(body, "name", 200); field(body, "email", 254); field(body, "phone", 40, true);
+    field(body, "companyWebsite", 200, false);
+    field(body, "message", 2000); field(body, "productName", 240, false); field(body, "productId", 120, false);
+  } catch (error) { return NextResponse.json({ error: (error as Error).message }, { status: 400 }); }
+
+  const name = (typeof body.name === "string" ? body.name.trim() : "");
+  const phone = (typeof body.phone === "string" ? body.phone.trim() : "");
+  const email = (typeof body.email === "string" ? body.email.trim() : "").toLowerCase();
+  const message = (typeof body.message === "string" ? body.message.trim() : "");
+  const productName = (typeof body.productName === "string" ? body.productName.trim() : "") || "General inquiry";
   const productId = body.productId ? String(body.productId) : null;
 
   const missing = [

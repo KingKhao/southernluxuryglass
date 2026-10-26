@@ -47,7 +47,7 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>
               <strong className="text-charcoal">The early-access signup form:</strong> your name,
-              email address, and phone number, plus whether you checked the
+              email address, and an optional phone number, plus whether you checked the
               box agreeing to receive text messages about new inventory.
             </li>
           </ul>
@@ -61,7 +61,8 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-xl text-emerald">Cookies &amp; tracking</h2>
+          <h2 className="font-serif text-xl text-emerald">Cookies, browser storage &amp; tracking</h2>
+            <p className="mt-2">Your browser stores saved-piece favorites and your text-message preference locally. You can remove these through your browser site-data settings. They are not advertising trackers. Optional phone details submitted with a signup are saved in our contact database even when texting is declined.</p>
           <p className="mt-2">
             This site uses one strictly-necessary cookie, used only to keep{" "}
             {CURATOR_NAME} signed in to the password-protected admin area she
@@ -124,14 +125,14 @@ export default function PrivacyPolicyPage() {
           <p className="mt-2">
             We keep inquiry and contact records for as long as reasonably
             needed to respond to you and to maintain our business and sales
-            records, or until you ask us to delete them.
+            records. You may request deletion through the Contact form; Crystal must review any specific records that need to be retained for an actual transaction or legal obligation. Approved erasure removes contact history, notes and matching inquiry copies. Hosting backups may follow the provider’s separate retention lifecycle.
           </p>
         </section>
 
         <section>
           <h2 className="font-serif text-xl text-emerald">Your choices</h2>
           <p className="mt-2">
-            You can ask us what we have on file for you, ask us to correct
+            To withdraw a saved text preference, use the Contact form before any future messaging service is enabled. This site currently stores preferences and does not automatically dispatch email or SMS. You can also ask us what we have on file for you, ask us to correct
             it, or ask us to delete it, by reaching out through the Contact
             form on this site. Because we&apos;re a small business without an
             automated self-service system, requests like this are handled by{" "}

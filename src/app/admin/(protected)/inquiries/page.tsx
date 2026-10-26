@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import InquiriesList from "@/components/admin/InquiriesList";
@@ -21,10 +23,12 @@ const FILTER_STATUS: Record<string, Prisma.InquiryWhereInput> = {
 export default async function AdminInquiriesPage({
   searchParams,
 }: {
-  searchParams: { filter?: string };
+  searchParams: Promise<{ filter?: string }>;
 }) {
+  if (!(await getSessionUsername())) redirect("/admin/login");
+  const query = await searchParams;
   const filter =
-    searchParams.filter && FILTER_STATUS[searchParams.filter] ? searchParams.filter : "all";
+    query.filter && FILTER_STATUS[query.filter] ? query.filter : "all";
 
   const where: Prisma.InquiryWhereInput = FILTER_STATUS[filter] ?? {};
 

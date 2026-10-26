@@ -1,11 +1,14 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import Link from "next/link";
 import LogoutButton from "@/components/admin/LogoutButton";
 
-export default function AdminProtectedLayout({
+export default async function AdminProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  if (!(await getSessionUsername())) redirect("/admin/login");
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-emerald/15 pb-5">

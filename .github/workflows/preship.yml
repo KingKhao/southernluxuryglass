@@ -1,0 +1,25 @@
+name: Preship checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://fixture:fixture@127.0.0.1:59999/fixture
+      DATABASE_URL_UNPOOLED: postgresql://fixture:fixture@127.0.0.1:59999/fixture
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx --no-install prisma generate
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test:security
+      - run: npm run test:storefront
+      - run: npm audit --audit-level=moderate
+      - run: npm run build

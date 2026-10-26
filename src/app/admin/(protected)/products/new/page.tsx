@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import ProductForm from "@/components/admin/ProductForm";
 import { createProduct } from "../actions";
@@ -5,6 +7,7 @@ import { createProduct } from "../actions";
 export const dynamic = "force-dynamic";
 
 export default async function NewProductPage() {
+  if (!(await getSessionUsername())) redirect("/admin/login");
   const categories = await prisma.category.findMany({ orderBy: { sortOrder: "asc" } });
 
   return (

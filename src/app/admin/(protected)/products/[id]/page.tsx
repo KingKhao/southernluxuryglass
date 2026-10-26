@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ProductForm from "@/components/admin/ProductForm";
@@ -8,10 +10,11 @@ export const dynamic = "force-dynamic";
 export default async function EditProductPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  if (!(await getSessionUsername())) redirect("/admin/login");
   const [product, categories] = await Promise.all([
-    prisma.product.findUnique({ where: { id: params.id } }),
+    prisma.product.findUnique({ where: { id: (await params).id } }),
     prisma.category.findMany({ orderBy: { sortOrder: "asc" } }),
   ]);
 

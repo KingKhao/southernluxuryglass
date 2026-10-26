@@ -6,7 +6,7 @@ import type { InquiryStatus } from "@prisma/client";
 // An inquiry can only move TO Working Lead or Serious Buyer — never back to New.
 const ALLOWED_TARGETS: InquiryStatus[] = ["WORKING_LEAD", "SERIOUS_BUYER"];
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await getSessionUsername())) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
@@ -24,16 +24,16 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     );
   }
   await prisma.inquiry.update({
-    where: { id: params.id },
+    where: { id: (await params).id },
     data: { status: status as InquiryStatus },
   });
   return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await getSessionUsername())) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
-  await prisma.inquiry.delete({ where: { id: params.id } });
+  await prisma.inquiry.delete({ where: { id: (await params).id } });
   return NextResponse.json({ ok: true });
 }

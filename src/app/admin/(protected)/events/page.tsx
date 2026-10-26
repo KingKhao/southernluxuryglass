@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { deleteEvent } from "./actions";
@@ -5,6 +7,7 @@ import { deleteEvent } from "./actions";
 export const dynamic = "force-dynamic";
 
 export default async function AdminEventsPage() {
+  if (!(await getSessionUsername())) redirect("/admin/login");
   const events = await prisma.event.findMany({ orderBy: { date: "asc" } });
 
   return (

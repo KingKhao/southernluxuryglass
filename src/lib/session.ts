@@ -1,70 +1,39 @@
 import { cookies } from "next/headers";
-
-const COOKIE_NAME = "admin_session";
-const SESSION_LENGTH_MS = 1000 * 60 * 60 * 12; // 12 hours
-
-function getSecret() {
-  const secret = process.env.SESSION_SECRET;
-  if (!secret) {
-    throw new Error("SESSION_SECRET is not set in the environment.");
-  }
-  return secret;
-}
-
-function toHex(buffer: ArrayBuffer) {
-  return Array.from(new Uint8Array(buffer))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-async function sign(payload: string) {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(getSecret()),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
-  return toHex(signature);
-}
-
+import { prisma } from "./prisma";
+import bcrypt from "bcryptjs";
+import { mintSessionToken, readSessionClaims, fingerprint, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "./session-token";
+export { SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "./session-token";
+const PREFIX = "admin-session:";
 export async function createSessionToken(username: string) {
-  const expires = Date.now() + SESSION_LENGTH_MS;
-  const payload = `${username}.${expires}`;
-  const signature = await sign(payload);
-  return `${payload}.${signature}`;
+  const admin = await prisma.admin.findUnique({ where: { username } }); if (!admin) throw new Error("Admin not found.");
+  const nonce = crypto.randomUUID().replace(/-/g, ""); const expires = Date.now() + SESSION_MAX_AGE_SECONDS * 1000;
+  await prisma.setting.create({ data: { key: PREFIX + nonce, value: { username, expires, credential: await fingerprint(admin.passwordHash) } } });
+  await prisma.setting.deleteMany({ where: { key: { startsWith: PREFIX }, updatedAt: { lt: new Date(Date.now() - SESSION_MAX_AGE_SECONDS * 1000) } } });
+  return mintSessionToken(username, nonce, expires);
 }
-
-function timingSafeEqual(a: string, b: string) {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++) {
-    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return mismatch === 0;
+export async function authenticatedUsername(token: string | undefined | null): Promise<string | null> {
+  const claims = await readSessionClaims(token); if (!claims) return null;
+  const [record, admin] = await Promise.all([prisma.setting.findUnique({ where: { key: PREFIX + claims.nonce } }), prisma.admin.findUnique({ where: { username: claims.username } })]);
+  if (!record || !admin) return null;
+  const value = record.value as { username?: string; expires?: number; credential?: string };
+  return value.username === claims.username && value.expires === claims.expires && value.credential === await fingerprint(admin.passwordHash) ? claims.username : null;
 }
-
-export async function verifySessionToken(token: string | undefined | null): Promise<string | null> {
-  if (!token) return null;
-  const parts = token.split(".");
-  if (parts.length !== 3) return null;
-  const [username, expiresStr, signature] = parts;
-  const payload = `${username}.${expiresStr}`;
-  const expected = await sign(payload);
-
-  if (!timingSafeEqual(signature, expected)) return null;
-
-  const expires = Number(expiresStr);
-  if (Number.isNaN(expires) || Date.now() > expires) return null;
-
-  return username;
+export async function getSessionUsername(): Promise<string | null> { return authenticatedUsername((await cookies()).get(SESSION_COOKIE_NAME)?.value); }
+export async function revokeCurrentSession() { return revokeSession((await cookies()).get(SESSION_COOKIE_NAME)?.value); }
+export async function revokeSession(token: string | undefined | null) {
+  const claims = await readSessionClaims(token);
+  if (claims) await prisma.setting.deleteMany({ where: { key: PREFIX + claims.nonce } });
 }
-
-export async function getSessionUsername(): Promise<string | null> {
-  const token = cookies().get(COOKIE_NAME)?.value;
-  return verifySessionToken(token);
+export async function requireAdminApi(req: { headers: Headers }): Promise<string | null> {
+  const match = (req.headers.get("cookie") || "").match(new RegExp(`(?:^|;\\s*)${SESSION_COOKIE_NAME}=([^;]+)`));
+  try { return authenticatedUsername(match ? decodeURIComponent(match[1]) : null); } catch { return null; }
 }
-
-export const SESSION_COOKIE_NAME = COOKIE_NAME;
-export const SESSION_MAX_AGE_SECONDS = SESSION_LENGTH_MS / 1000;
+export async function verifyAdminPassword(username: string, password: string): Promise<boolean> {
+  const admin = await prisma.admin.findUnique({ where: { username } }); return !!admin && bcrypt.compare(password, admin.passwordHash);
+}
+export async function changeAdminPassword(username: string, currentPassword: string, newPassword: string) {
+  if (!(await verifyAdminPassword(username, currentPassword))) return false;
+  await prisma.admin.update({ where: { username }, data: { passwordHash: await bcrypt.hash(newPassword, 10) } });
+  // Credential fingerprint mismatch immediately invalidates every old session.
+  return true;
+}

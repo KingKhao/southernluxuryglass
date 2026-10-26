@@ -1,3 +1,4 @@
+import { eraseContact } from "@/lib/erase-contact";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUsername } from "@/lib/session";
@@ -24,9 +25,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "id or email is required." }, { status: 400 });
   }
 
-  const result = id
-    ? await prisma.contact.deleteMany({ where: { id } })
-    : await prisma.contact.deleteMany({ where: { email } });
+  const contacts = await prisma.contact.findMany({ where: id ? { id } : { email: { equals: email, mode: "insensitive" } }, select: { id: true } });
+  let deleted = 0;
+  for (const contact of contacts) deleted += await eraseContact(contact.id);
 
-  return NextResponse.json({ deleted: result.count });
+  return NextResponse.json({ deleted });
 }
