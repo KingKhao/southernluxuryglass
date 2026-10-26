@@ -38,7 +38,7 @@ export default function EventSchedule({ events }: { events: EventItem[] }) {
                 key={i}
                 className={[
                   "flex h-9 items-center justify-center rounded-full text-sm",
-                  day.inCurrentMonth ? "text-charcoal" : "text-charcoal/35",
+                  day.inCurrentMonth ? "text-charcoal" : "text-charcoal-muted",
                   isToday ? "bg-emerald text-cream" : "",
                   day.hasEvent && !isToday ? "bg-gold/20 font-semibold text-emerald" : "",
                 ].join(" ")}

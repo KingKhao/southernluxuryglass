@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/session";
+import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/session-token";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -13,10 +13,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (username && isLoginPage) {
-    const dashboardUrl = new URL("/admin", request.url);
-    return NextResponse.redirect(dashboardUrl);
-  }
+  // Login stays reachable even when a signed session has been revoked server-side.
 
   return NextResponse.next();
 }

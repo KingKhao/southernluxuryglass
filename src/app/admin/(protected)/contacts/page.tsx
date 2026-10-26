@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { createContact } from "./actions";
@@ -28,11 +30,13 @@ const VALID_CATEGORIES = ["NEW", "FOLLOWER", "BUYER", "B2B"];
 export default async function AdminContactsPage({
   searchParams,
 }: {
-  searchParams: { category?: string };
+  searchParams: Promise<{ category?: string }>;
 }) {
+  if (!(await getSessionUsername())) redirect("/admin/login");
+  const query = await searchParams;
   const category =
-    searchParams.category && VALID_CATEGORIES.includes(searchParams.category)
-      ? (searchParams.category as ContactCategory)
+    query.category && VALID_CATEGORIES.includes(query.category)
+      ? (query.category as ContactCategory)
       : "all";
 
   const where: Prisma.ContactWhereInput = category === "all" ? {} : { category };

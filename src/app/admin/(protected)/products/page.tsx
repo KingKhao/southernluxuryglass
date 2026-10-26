@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { deleteProduct, toggleFeatured } from "./actions";
@@ -5,6 +7,7 @@ import { deleteProduct, toggleFeatured } from "./actions";
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
+  if (!(await getSessionUsername())) redirect("/admin/login");
   const products = await prisma.product.findMany({
     orderBy: { createdAt: "desc" },
     include: { category: true },

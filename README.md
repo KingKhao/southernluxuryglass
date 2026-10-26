@@ -1,36 +1,7 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Southern Luxury Glass
 
-## Getting Started
+Crystal Brisbois's inquiry-only antique and vintage glassware catalog, presented in the CVD portfolio. It is a real business with intentionally stored contact/inquiry records; there is no online checkout or automatic email/SMS sender. The business operates from Morristown, Tennessee.
 
-First, run the development server:
+Next.js 15 / React 19 / Prisma / Postgres / Vercel Blob. Set credentials only in local ignored environment files or the host secret store. Never put production customer data in this repository.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [PRESHIP.md](PRESHIP.md) for build/test/release instructions, [SECURITY.md](SECURITY.md) for reporting and secret rules, and [ASSETS.md](ASSETS.md) for provenance limits. Policy drafts need human review. Public code availability does not grant a license to business photography or imply compliance certification.

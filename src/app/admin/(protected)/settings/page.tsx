@@ -1,9 +1,12 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import { getSettings } from "@/lib/settings";
 import SettingsForm from "@/components/admin/SettingsForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
+  if (!(await getSessionUsername())) redirect("/admin/login");
   const settings = await getSettings();
 
   return (

@@ -3,11 +3,11 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getSessionUsername } from "@/lib/session";
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await getSessionUsername())) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
-  const { id } = params;
+  const { id } = await params;
   const body = await req.json();
 
   const data: { name?: string; sortOrder?: number } = {};
@@ -29,11 +29,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(category);
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await getSessionUsername())) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
-  const { id } = params;
+  const { id } = await params;
 
   const productCount = await prisma.product.count({ where: { categoryId: id } });
   if (productCount > 0) {

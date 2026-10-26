@@ -1,9 +1,12 @@
+import { redirect } from "next/navigation";
+import { getSessionUsername } from "@/lib/session";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
+  if (!(await getSessionUsername())) redirect("/admin/login");
   const [productCount, featuredCount, eventCount] = await Promise.all([
     prisma.product.count(),
     prisma.product.count({ where: { featured: true } }),

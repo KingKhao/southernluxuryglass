@@ -106,7 +106,7 @@ export default function SignupForm({
   if (done) {
     return (
       <p className="font-serif text-lg text-emerald" role="status">
-        You&apos;re on the list! You&apos;ll be first to see new pieces. ✨
+        Your signup is saved. Crystal manages announcements personally; this form does not send a message.
       </p>
     );
   }
@@ -130,7 +130,7 @@ export default function SignupForm({
 
         <input
           required
-          placeholder="Your name"
+          placeholder="Your name" aria-label="Your name" maxLength={200}
           value={name}
           onChange={(e) => setName(e.target.value)}
           className={field}
@@ -138,15 +138,14 @@ export default function SignupForm({
         <input
           required
           type="email"
-          placeholder="Email address"
+          placeholder="Email address" aria-label="Email address" maxLength={254}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className={field}
         />
         <input
-          required
           type="tel"
-          placeholder="Phone number"
+          placeholder="Phone number (optional)" aria-label="Phone number (optional)" maxLength={40}
           aria-describedby="signup-phone-hint"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
@@ -156,7 +155,7 @@ export default function SignupForm({
         <p id="signup-phone-hint" className={`text-xs ${mutedText}`}>
           {consentDecided ? (
             <>
-              {smsConsent ? "✓ We'll text you when something new comes in." : "Texting is off."}{" "}
+              {smsConsent ? "✓ Text preference saved. Text delivery is not enabled yet." : "Texting is off."}{" "}
               <button
                 type="button"
                 onClick={() => setShowConsentModal(true)}
@@ -166,7 +165,7 @@ export default function SignupForm({
               </button>
             </>
           ) : (
-            "Your phone number is only used if you agree to texting when asked."
+            "Phone is optional. If provided, it is saved with your signup; texting requires your separate choice."
           )}
         </p>
 

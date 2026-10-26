@@ -4,8 +4,8 @@
 // apart from consent given under earlier wording. Bump the relevant version
 // whenever /privacy, /terms, or the SMS consent checkbox's own text changes
 // in a way that matters, not on typo fixes.
-export const PRIVACY_POLICY_VERSION = "1.0.0";
-export const TERMS_VERSION = "1.0.0";
-export const SMS_CONSENT_VERSION = "1.0.0";
+export const PRIVACY_POLICY_VERSION = "1.1.0";
+export const TERMS_VERSION = "1.1.0";
+export const SMS_CONSENT_VERSION = "1.1.0";
 
-export const LEGAL_LAST_UPDATED = "September 16, 2026";
+export const LEGAL_LAST_UPDATED = "October 26, 2026";

@@ -102,7 +102,7 @@ export default function TermsPage() {
         <section>
           <h2 className="font-serif text-xl text-emerald">Governing law</h2>
           <p className="mt-2">
-            These terms are governed by the laws of [STATE — to be confirmed],
+            These terms are governed by the laws of Tennessee,
             without regard to conflict-of-law principles. (Placeholder —
             fill in once your business&apos;s home state is confirmed.)
           </p>

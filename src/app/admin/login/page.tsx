@@ -16,22 +16,12 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError(null);
 
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-
-    setLoading(false);
-
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Login failed.");
-      return;
-    }
-
-    router.push("/admin");
-    router.refresh();
+    try {
+      const res = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) });
+      if (!res.ok) { const data = await res.json().catch(() => ({})); setError(data.error ?? "Login failed."); return; }
+      router.push("/admin"); router.refresh();
+    } catch { setError("Unable to connect. Please try again."); }
+    finally { setLoading(false); }
   }
 
   return (
