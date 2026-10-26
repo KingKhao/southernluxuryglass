@@ -1,21 +1,25 @@
 export const dynamic = "force-dynamic";
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Lato } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import StorefrontMotion from "@/components/StorefrontMotion";
 
-const display = Playfair_Display({
-  subsets: ["latin"],
+const display = localFont({
+  src: "./fonts/playfair-display-latin.woff2",
   variable: "--font-display",
-  weight: ["500", "600", "700"],
+  weight: "500 700",
+  display: "swap",
 });
 
-const body = Lato({
-  subsets: ["latin"],
+const body = localFont({
+  src: [
+    { path: "./fonts/lato-regular-latin.woff2", weight: "400" },
+    { path: "./fonts/lato-bold-latin.woff2", weight: "700" },
+  ],
   variable: "--font-body",
-  weight: ["400", "700"],
+  display: "swap",
 });
 
 const TITLE = "Southern Luxury Glass | Curated by Crystal Brisbois";
